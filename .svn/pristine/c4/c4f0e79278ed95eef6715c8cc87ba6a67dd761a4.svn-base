@@ -1,0 +1,45 @@
+<!--<h2>Có tổng cộng: {{listProcess.length}} Process khác nhau</h2>-->
+<!--<div *ngIf="listProcess.length>0">-->
+
+<!--</div>-->
+<div>
+  <tabset>
+    <tab heading="Process RealTime" id="tab1" (select)="selectTab = false">
+      <table datatable [dtOptions]="dtOptions" id="ProcessTable" class="table-responsive table table-hover">
+      </table>
+      <!--<table datatable [dtOptions]="dtOptions" class="table-responsive table table-hover"></table>-->
+      <div style="text-align: center">
+        <button (click)="findStudent()" style="margin: auto; margin-right: 20px" class="btn btn-outline-danger">Who use those proces</button>
+        <button (click)="KillProcess()" style="margin: auto; margin-right: 20px" class="btn btn-outline-danger">Kill Process</button>
+        <button (click)="ChangeToMustKill()" style="margin: auto;" class="btn btn-outline-info">Move to Must Kill</button>
+      </div>
+    </tab>
+    <tab heading="Process must kill" (select)="selectTab = false">
+      <h2 style="margin-top: 30px">Process must kill</h2>
+      <table style="max-width: 100%" datatable [dtOptions]="dtOptions2" id="" class="table table-hover"></table>
+      <div style="text-align: center">
+        <button (click)="DeleteDatabaseProcess()" style="margin: auto; margin-right: 20px" class="btn btn-outline-danger">
+          Delete Process
+        </button>
+      </div>
+    </tab>
+    <tab (select)="reloadTable(2)" [(active)]="selectTab" heading="Process By Student">
+      <h2 style="margin-top: 30px">Student</h2>
+      <table datatable [dtOptions]="dtOptions3" id="" class="table table-hover"></table>
+      <div style="text-align: center">
+      </div>
+    </tab>
+    <tab heading="Process Exception" (select)="selectTab = false">
+      <h2 style="margin-top: 30px">Process Exception</h2>
+      <table style="max-width: 100%" datatable [dtOptions]="dtOptions4" id="" class="table table-hover"></table>
+      <div style="text-align: center">
+        <button (click)="AddByFormProcess()" style="margin: auto; margin-right: 20px" class="btn btn-outline-primary">
+          Add new Process
+        </button>
+        <button (click)="DeleteDatabaseProcess(3)" style="margin: auto; margin-right: 20px" class="btn btn-outline-danger">
+          Delete Process
+        </button>
+      </div>
+    </tab>
+  </tabset>
+</div>

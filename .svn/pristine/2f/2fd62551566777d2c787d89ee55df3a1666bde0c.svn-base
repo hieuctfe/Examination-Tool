@@ -1,0 +1,31 @@
+<div *ngIf="!course" id="course-segment">
+  <h4>List Departments and Courses</h4>
+  <kendo-treeview [nodes]="departments | async" textField="name" [hasChildren]="hasCourse" [children]="loadCourse"
+                  [(expandedKeys)]="expandList"
+                  (nodeClick)="setCourse($event)" kendoTreeViewExpandable>
+    <ng-template kendoTreeViewNodeTemplate let-dataItem>
+      <div class="card w-100">
+        <div class="card-body d-flex">
+          <div class="d-flex align-items-center mr-auto">
+            {{dataItem.name}}
+          </div>
+          <div *ngIf="(user?.roles.indexOf('Examinator') !== -1
+          || user?.roles.indexOf('Leader') !== -1)
+          &&  dataItem.child" class="action">
+            <button class="btn btn-info mr-2" (click)="showModal(dataItem, dataItem.department)">
+              <i class="ion ion-md-create"></i>
+            </button>
+            <button class="btn btn-danger" (click)="delete(dataItem)">
+              <i class="ion ion-md-trash"></i>
+            </button>
+          </div>
+          <div *ngIf="user?.roles.indexOf('Examinator') !== -1 &&  !dataItem.child" class="action">
+            <button class="btn btn-info mr-2" (click)="showModal(null, dataItem.code)">
+              <i class="ion ion-md-add"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </kendo-treeview>
+</div>

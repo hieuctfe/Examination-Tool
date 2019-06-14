@@ -1,0 +1,36 @@
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Course} from '../../../model/course.model';
+import {Exam} from '../../../model/exam.model';
+import {CourseService} from '../../../services/course.service';
+import {SemesterService} from '../../../services/semester.service';
+
+@Component({
+  selector: 'Mex-verify-course',
+  templateUrl: './verify-course.component.html',
+  styleUrls: ['./verify-course.component.scss']
+})
+export class VerifyCourseComponent implements OnInit {
+  @Input() exam: Exam;
+  @Output() examChange = new EventEmitter();
+  courses = [];
+
+  courseSetting = {
+    singleSelection: true,
+    idField: 'code',
+    textField: 'name',
+    selectAllText: 'Select All',
+    unSelectAllText: 'UnSelect All',
+    allowSearchFilter: true,
+    closeDropDownOnSelection: true
+  };
+
+  constructor(private courseSV: CourseService) {
+  }
+
+  ngOnInit() {
+    this.exam.course = new Course().deserialize({id: null, name: null});
+    this.courseSV.getAllCourse().subscribe((src: any[]) => {
+      this.courses = src;
+    }, er => console.log(er));
+  }
+}

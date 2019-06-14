@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,aAAa;EACX,UAAU,EAAE,mBAAkB",
+"sources": ["setting-exam.component.scss"],
+"names": [],
+"file": "setting-exam.component.css"
+}

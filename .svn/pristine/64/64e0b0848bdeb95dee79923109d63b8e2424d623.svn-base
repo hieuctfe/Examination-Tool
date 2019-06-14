@@ -1,0 +1,95 @@
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+
+import { AppRoutingModule } from './app-routing.module';
+import { IndexComponent } from './components/index/index.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { HeaderComponent } from './components/header/header.component';
+import { RouterModule } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { SideBarComponent } from './components/side-bar/side-bar.component';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { SharedService } from './services/shared.service';
+import { CourseService } from './services/course.service';
+import { QuestionService } from './services/question.service';
+import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
+import { BsDropdownModule, CollapseModule, ModalModule, TabsModule } from 'ngx-bootstrap';
+import { ParserService } from './services/parser.service';
+import { RequestCacheService } from './services/request-cache.service';
+import { CachingInterceptor } from './intercepters/intercepter';
+import { SweetAlert2Module } from '@toverux/ngx-sweetalert2';
+import { DepartmentService } from './services/department.service';
+import { TreeViewModule } from '@progress/kendo-angular-treeview';
+import {
+  SocialLoginModule,
+  AuthServiceConfig,
+} from 'angular-6-social-login';
+import { AuthenService, getAuthServiceConfigs } from './services/authen.service';
+import { ProcessComponent } from './components/process/process.component';
+import { PreviousRouteService } from './services/previsousRoute.service';
+import { OWL_DATE_TIME_FORMATS } from 'ng-pick-datetime';
+import { SwiperModule } from 'ngx-swiper-wrapper';
+import { SecretKeyComponent } from './secret-key/secret-key.component';
+// import { CourseFilterPipe } from './course-filter.pipe';
+
+const DATE_FORMAT = {
+  parseInput: 'DD/MM/YYYY hh:mm',
+  fullPickerInput: 'DD/MM/YYYY hh:mm',
+  datePickerInput: 'DD/MM/YYYY hh:mm',
+};
+
+@NgModule({
+  declarations: [
+    IndexComponent,
+    HeaderComponent,
+    FooterComponent,
+    DashboardComponent,
+    SideBarComponent,
+    ProcessComponent,
+    SecretKeyComponent,
+  ],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    RouterModule,
+    AppRoutingModule,
+    HttpClientModule,
+    SocialLoginModule,
+    SwiperModule,
+    CollapseModule.forRoot(),
+    TabsModule.forRoot(),
+    ModalModule.forRoot(),
+    BsDropdownModule.forRoot(),
+    Ng4LoadingSpinnerModule.forRoot(),
+    TreeViewModule,
+    SweetAlert2Module.forRoot({
+      buttonsStyling: false,
+      customClass: 'modal-content',
+      confirmButtonClass: 'btn btn-info',
+      cancelButtonClass: 'btn'
+    })
+  ],
+  providers: [
+    SharedService,
+    CourseService,
+    QuestionService,
+    ParserService,
+    DepartmentService,
+    RequestCacheService,
+    AuthenService,
+    PreviousRouteService,
+    {
+      provide: AuthServiceConfig,
+      useFactory: getAuthServiceConfigs
+    },
+    {
+      provide: OWL_DATE_TIME_FORMATS,
+      useValue: DATE_FORMAT
+    },
+    { provide: HTTP_INTERCEPTORS, useClass: CachingInterceptor, multi: true }
+  ],
+  bootstrap: [IndexComponent]
+})
+export class AppModule {
+}

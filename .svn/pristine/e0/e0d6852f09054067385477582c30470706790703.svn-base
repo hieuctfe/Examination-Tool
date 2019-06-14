@@ -1,0 +1,50 @@
+<div *ngIf="baseTest">
+  <div *ngIf="baseTest.status !== 0" class="text-center mb-4">
+    <div class="card border-0 align-items-center">
+      <div style="width: 500px; border: 1px solid black; background: lightgoldenrodyellow"
+           class="card-body border-dark p-4">
+        <h4 class="text-center">Course : <b class="text-danger">{{baseTest.course}}</b></h4>
+        <table class="table w-100">
+          <tr class="border-0">
+            <td class="border-0 text-left">Start Date :</td>
+            <td class="border-0 text-right font-weight-bold">{{baseTest.startTime | date: 'dd/MM/yyyy - HH:mm'}}
+            </td>
+          </tr>
+          <tr class="border-0">
+            <td class="border-0 text-left">End Date :</td>
+            <td class="border-0 text-right font-weight-bold">{{baseTest.endTime| date: 'dd/MM/yyyy - HH:mm'}}</td>
+          </tr>
+          <tr class="border-0">
+            <td class="border-0 text-left">Number of questions :</td>
+            <td class="border-0 text-right font-weight-bold">{{baseTest.numberOfQuestion}}</td>
+          </tr>
+          <tr class="border-0">
+            <td class="border-0 text-left">Duration :</td>
+            <td class="border-0 text-right font-weight-bold">{{baseTest.duration}}</td>
+          </tr>
+          <tr class="border-0">
+            <td class="border-0 text-left">Status :</td>
+            <td class="border-0 text-right font-weight-bold">
+              <ng-container [ngSwitch]="baseTest.status">
+                <ng-container *ngSwitchCase="0">Waiting</ng-container>
+                <ng-container *ngSwitchCase="1">Taken</ng-container>
+                <ng-container *ngSwitchCase="2">Edited</ng-container>
+                <ng-container *ngSwitchCase="3">Approved</ng-container>
+                <ng-container *ngSwitchCase="4">Rejected</ng-container>
+              </ng-container>
+            </td>
+          </tr>
+          <tr class="border-0">
+            <td class="border-0 text-left">Mark :</td>
+            <td class="border-0 text-right font-weight-bold">{{baseTest.mark}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <ng-container *ngIf="baseTest">
+    <Mex-approve *ngIf="baseTest.status === 1 || baseTest.status === 2" [baseTest]="baseTest"
+                 (baseTestChange)="loadTest()"></Mex-approve>
+    <Mex-do-test *ngIf="baseTest.status === 0" [baseTest]="baseTest" (baseTestChange)="loadTest()"></Mex-do-test>
+  </ng-container>
+</div>

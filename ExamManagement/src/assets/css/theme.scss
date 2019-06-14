@@ -1,0 +1,14 @@
+$main-cl: #4ba89c;
+$second-main-cl: #20897b;
+
+.btn-info {
+  background-color: $main-cl !important;
+}
+
+.btn-warning i {
+  color: white;
+}
+
+.btn-secondary {
+  background-color: $second-main-cl !important;
+}

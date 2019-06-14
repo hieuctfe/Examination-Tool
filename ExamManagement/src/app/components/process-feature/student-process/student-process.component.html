@@ -1,0 +1,41 @@
+<div>
+  <tabset>
+    <tab heading="Process RealTime" id="tab1">
+      <table datatable [dtOptions]="dtOptions" id="ProcessTable" class="table table-hover">
+      </table>
+      <!--<table datatable [dtOptions]="dtOptions" class="table-responsive table table-hover"></table>-->
+      <div style="text-align: center">
+        <button (click)="KillProcess()" style="margin: auto; margin-right: 20px" class="btn btn-outline-danger">Kill Process
+        </button>
+        <button (click)="ChangeToMustKill()" style="margin: auto;" class="btn btn-outline-info">Move to Must Kill
+        </button>
+      </div>
+    </tab>
+    <tab heading="Process must kill">
+      <h2 style="margin-top: 30px">Process must kill</h2>
+      <table datatable [dtOptions]="dtOptions2" id="" class="table-responsive table table-hover"></table>
+      <div style="text-align: center">
+        <button (click)="DeleteDatabaseProcess()" style="margin: auto; margin-right: 20px" class="btn btn-outline-danger">
+          Delete Process
+        </button>
+      </div>
+    </tab>
+    <tab heading="Student Screen">
+      <h2 style="margin-top: 30px">Screen Sharing</h2>
+      <img src="{{src}}" alt="">
+      <div style="display: block; margin-top: 25px">
+        <button (click)="TestScreen()" style="margin: auto; margin-right: 20px" class="btn btn-outline-danger">
+          Get Student Screen
+        </button>
+      </div>
+    </tab>
+    <tab heading="Get Student Exam">
+      <h2 style="margin-top: 30px">Summit Student Exam</h2>
+      <div style="display: block; margin-top: 25px">
+        <button (click)="summitExam()" style="margin: auto; margin-right: 20px" class="btn btn-outline-danger">
+          Summit student Exam
+        </button>
+      </div>
+    </tab>
+  </tabset>
+</div>

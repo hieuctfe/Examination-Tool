@@ -1,0 +1,12 @@
+<div class="w-100">
+  <div class="form-group" >
+    <label class="d-block"><b>Course</b></label>
+    <ng-multiselect-dropdown
+    [placeholder]="'Select a Course'"
+    [data]="courses"
+    [(ngModel)]="exam.course"
+    [settings]="courseSetting">
+  </ng-multiselect-dropdown>
+  </div>
+</div>
+

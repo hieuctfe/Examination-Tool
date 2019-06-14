@@ -1,0 +1,81 @@
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {GlobalVariable} from '../../global';
+import {QuestionService} from '../../services/question.service';
+import swal from 'sweetalert2';
+
+@Component({
+  selector: 'Mex-process',
+  templateUrl: './process.component.html',
+  styleUrls: ['./process.component.scss']
+})
+export class ProcessComponent implements OnInit, OnDestroy {
+  GlobalVariable = GlobalVariable;
+  listData = [];
+  contentData: any;
+  interval: any;
+
+  constructor(private questionSV: QuestionService) {
+  }
+
+  ngOnInit() {
+    this.loadMatching();
+  }
+
+  loadMatching() {
+    this.questionSV.getImportStatus().subscribe((el: any) => {
+      this.listData = el;
+      if (this.contentData) {
+        const index = this.listData.map(r => r.id).indexOf(this.contentData.id);
+        if (index !== -1) {
+          this.setContent(this.listData[index]);
+        }
+      }
+      if (!this.interval) {
+        this.interval = setInterval(() => {
+          this.loadMatching();
+        }, 2000);
+      }
+    }, er => {
+    });
+  }
+
+  remove(index) {
+    this.contentData.sameQuestion.splice(index, 1);
+  }
+
+  getPercent() {
+    return Math.floor(this.contentData.current / this.contentData.total * 100);
+  }
+
+  setContent(q) {
+    if (!this.contentData || this.contentData.id !== q.id || (this.contentData.total !== this.contentData.current)) {
+      if (q.sameQuestion.length !== 0 && typeof q.sameQuestion === 'string') {
+        q.sameQuestion = JSON.parse(q.sameQuestion);
+      }
+      if (q.failQuestion.length !== 0 && typeof q.failQuestion === 'string') {
+        q.failQuestion = JSON.parse(q.failQuestion);
+      }
+      console.log(q);
+      this.contentData = q;
+    }
+  }
+
+  verify() {
+    const questions = this.contentData.sameQuestion.map(el => el.questionUploaded);
+    const data = {
+      course: this.contentData.courseCode,
+      questions: questions
+    };
+    this.questionSV.verifyImport(data).subscribe(el => {
+      this.questionSV.verify(this.contentData.id).subscribe(r => {
+        swal('Success', 'Success verified', 'success');
+        this.contentData = null;
+      });
+    });
+  }
+
+  ngOnDestroy() {
+    clearInterval(this.interval);
+  }
+
+}

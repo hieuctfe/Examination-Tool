@@ -1,0 +1,4 @@
+.btn-disabled {
+  background: darkgray !important; }
+
+/*# sourceMappingURL=setting-exam.component.css.map */

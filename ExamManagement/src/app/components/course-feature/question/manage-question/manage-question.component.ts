@@ -1,0 +1,135 @@
+import {Component, OnInit} from '@angular/core';
+import swal from 'sweetalert2';
+import {GlobalVariable} from '../../../../global';
+import {QuestionService} from '../../../../services/question.service';
+import {MessageService} from '../../../../services/message.service';
+import {QuestionFormModalComponent} from '../question-form-modal/question-form-modal.component';
+import {ActivatedRoute} from '@angular/router';
+
+@Component({
+  selector: 'Mex-manage-question',
+  templateUrl: './manage-question.component.html',
+  styleUrls: ['./manage-question.component.scss']
+})
+export class ManageQuestionComponent implements OnInit {
+  GlobalVariable = GlobalVariable;
+  course: string;
+  sortable = {
+    type: 'asc',
+    current: 'Code'
+  };
+  config = {
+    data: [],
+    filter: {
+      itemsPerPage: 10,
+      currentPage: 0,
+      totalItems: 0,
+      searchValue: '',
+      sortField: null
+    }
+  };
+
+  constructor(private questionSV: QuestionService, private messageSV: MessageService,
+              private route: ActivatedRoute) {
+  }
+
+  ngOnInit() {
+    this.route.parent.parent.params.subscribe(params => {
+      this.course = params['course'];
+      console.log(this.course);
+      this.getQuestion();
+    });
+  }
+
+  getQuestion(data = null, colTable = null) {
+    if (colTable) {
+      data.sortField = colTable;
+      if (this.sortable.current === colTable) {
+        this.sortable.type = this.sortable.type === 'asc' ? 'dsc' : 'asc';
+      } else {
+        this.sortable = {
+          type: 'asc',
+          current: colTable
+        };
+      }
+    }
+    this.questionSV.getAll(this.course, data, this.sortable.type).subscribe((resp: Response) => {
+      const paging = JSON.parse(resp.headers.get('paging-header')) as any;
+      this.config = {
+        data: resp.body as any,
+        filter: {
+          itemsPerPage: paging.pageSize,
+          currentPage: paging.pageIndex,
+          totalItems: paging.totalElement,
+          searchValue: paging.searchValue,
+          sortField: this.sortable.current
+        }
+      };
+    }, er => console.log(er));
+  }
+
+  expand(data) {
+    if (data.open === undefined) {
+      data.open = true;
+      return;
+    }
+    data.open = !data.open;
+  }
+
+  setPage(page) {
+    this.config.filter.currentPage = page;
+    this.getQuestion(this.config.filter);
+  }
+
+  openModal(data) {
+    this.questionSV.getQuestion(data.code).subscribe((el: any) => {
+      this.messageSV.createModal(el, QuestionFormModalComponent).subscribe((value: any) => {
+        if (value.success) {
+          if (value.data && Object.keys(value.data).length > 0) {
+            if (Object.keys(data).length > 0) {
+              value.data.baseTestId = null;
+              this.questionSV.updateQuestion(value.data).subscribe(res => {
+                swal('Success', 'Update Successful', 'success');
+                this.getQuestion();
+              }, er => {
+                swal('Error', 'Some error has occurred', 'error');
+              });
+            }
+          }
+        }
+      });
+    }, er => {
+      console.log(er);
+    });
+  }
+
+  confirm(data) {
+    swal({
+      title: 'Are you sure?',
+      text: 'Question ' + data.code + ' will be deleted!',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonClass: 'btn btn-info',
+      cancelButtonClass: 'btn'
+    }).then(result => {
+      if (result.value) {
+        this.questionSV.deleteQuestion(data.code).subscribe(sc => {
+          swal(
+            'Deleted!',
+            'Question has been deleted',
+            'success'
+          );
+          this.getQuestion();
+        }, er => {
+          swal(
+            'Error',
+            'Some error has occurred',
+            'error'
+          );
+        });
+      }
+    });
+  }
+}

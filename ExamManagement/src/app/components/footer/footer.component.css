@@ -1,0 +1,27 @@
+.btn-info {
+  background-color: #4ba89c !important; }
+
+.btn-warning i {
+  color: white; }
+
+.btn-secondary {
+  background-color: #20897b !important; }
+
+.footer-main {
+  background: #4ba89c;
+  color: white; }
+
+ul {
+  padding-left: 0; }
+  ul a {
+    color: white; }
+
+.mail-link {
+  color: white;
+  text-decoration: underline; }
+
+.media-icon i {
+  font-size: 20px;
+  margin-right: 5px; }
+
+/*# sourceMappingURL=footer.component.css.map */

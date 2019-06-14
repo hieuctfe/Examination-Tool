@@ -1,0 +1,38 @@
+<div class="card mt-4">
+  <div class="card-body">
+    <h4 class="text-center">Manage Learning OutCome</h4>
+    <div class="d-flex mb-4">
+      <button class="btn btn-info" (click)="showModal(null, false, true)">
+        Add new Main Objective
+      </button>
+      <button [disabled]="!isChange" class="ml-auto btn btn-secondary mr-2" (click)="save()">
+        Save
+      </button>
+      <button [disabled]="!isChange" class="btn" (click)="reset()">
+        Reset
+      </button>
+    </div>
+    <tree-root #treeView [nodes]="tree" [options]="options">
+      <ng-template #treeNodeTemplate let-node let-index="index">
+        <div class="card" *ngIf="node.data.data.state !== 3">
+          <div class="card-body">
+            <div class="d-flex">
+              <span>{{ node.data.data.name }}</span>
+              <button *ngIf="node.data.data.name != 'Others' && node.data.haveChildren" (click)="showModal(node, false, false)"
+                      [ngClass]="node.data.haveChildren ? 'ml-auto mr-2': ''" class=" btn btn-info">
+                <i class="ion ion-md-add"></i>
+              </button>
+              <button *ngIf="node.data.data.name != 'Others'" class="btn btn-warning" (click)="showModal(node, true, node.data.haveChildren ? true : false)"
+                      [ngClass]="!node.data.haveChildren ? 'ml-auto': ''">
+                <i class="ion ion-md-create"></i>
+              </button>
+              <button  *ngIf="node.data.data.name != 'Others'" class=" ml-2 btn btn-danger" (click)="remove(node ,node.data.haveChildren ? true : false)">
+                <i class="ion ion-md-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </tree-root>
+  </div>
+</div>

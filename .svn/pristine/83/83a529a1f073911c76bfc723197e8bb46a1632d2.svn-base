@@ -1,0 +1,36 @@
+<div class="card mt-4">
+  <div class="card-body">
+    <h4 class="text-center">Manage Learning OutCome</h4>
+    <div class="d-flex mb-4">
+      <button class="btn btn-info" (click)="addNew('MO', null)">
+        Add new Main Objective
+      </button>
+      <button [disabled]="!isChange" class="ml-auto btn btn-secondary mr-2" (click)="save()">
+        Save
+      </button>
+      <button [disabled]="!isChange" class="btn" (click)="reset()">
+        Reset
+      </button>
+    </div>
+    <tree-root [nodes]="tree" [options]="options">
+      <ng-template #treeNodeTemplate let-node let-index="index">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex">
+              <span>{{ node.data.data.name }}</span>
+              <button *ngIf="node.data.haveChildren" [ngClass]="node.data.haveChildren ? 'ml-auto mr-2': ''" class=" btn btn-info">
+                <i class="ion ion-md-add"></i>
+              </button>
+              <button class="btn btn-warning" [ngClass]="!node.data.haveChildren ? 'ml-auto': ''">
+                <i class="ion ion-md-create"></i>
+              </button>
+              <button class=" ml-2 btn btn-danger">
+                <i class="ion ion-md-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </tree-root>
+  </div>
+</div>

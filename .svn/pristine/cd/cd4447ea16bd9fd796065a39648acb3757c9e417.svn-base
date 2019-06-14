@@ -1,0 +1,10 @@
+// question: 44236  name: U01-Q009
+::U01-Q009::[html]<p>Given </p>\n<p>&lt;?xml version\=&quot;1.0&quot;encoding\=&quot;UTF-8&quot;?&gt;</p>\n<p>&lt;library xmlns\:ns\=&quot;http\://www.fpt.edu.vn&quot;</p>\n<p>xmlns\:article\=&quot;http\://www.article.fpt.edu.vn&quot;</p>\n<p>xmlns\:person\=&quot;http\://www.biolography.com.vn&quot;&gt;</p>\n<p>&lt;book article\:id\=&quot;B0001&quot; id\=&quot;IB8976&quot;&gt;</p>\n<p>&lt;article\:title&gt;The Firm&lt;/article\:Title&gt;</p>\n<p>&lt;person\:author&gt;John Grisham&lt;/person\:author&gt;</p>\n<p>&lt;article\:price&gt;99&lt;/article\:price&gt;</p>\n<p>&lt;/book&gt;</p>\n<p>&lt;/library&gt;</p>\n<p>Choose correct statement </p>{
+	~%33.33333%The XML code fragment has no default namespace
+	~%33.33333%The XML code fragment has 3 namespaces difference default namespace
+	~%-50%The XML code fragment is well-formed
+	~%33.33333%The XML code fragment is not well-formed because start-tags and end-tags are not matched
+	~%-50%The XML code fragment is not well-formed because the id attribute is duplicated
+}
+
+

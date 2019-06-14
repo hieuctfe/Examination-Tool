@@ -1,0 +1,52 @@
+<div class="body-exam">
+  <form [formGroup]="form" (ngSubmit)="submit(form.value)">
+    <div class="row">
+      <div class="question-info col-4 col-md-2" style="overflow: auto">
+        <div class="card" style="margin-top: 10px">
+          <div class="body text-center">
+            <b>Time for Exam : </b>
+            <h3 [ngClass]="redTime ? 'text-danger' : ''">{{timer}}</h3>
+          </div>
+          <button type="submit" class="btn btn-info mr-2 w-100">Submit</button>
+        </div>
+      </div>
+      <div class="question-info col-8 col-md-10">
+        <div *ngFor="let item of baseTest.questions; let i = index" id="{{item.id}}" class="quest col-md-12 row">
+          <div style="max-width: 100%" class="question-box text-question w-100 card">
+            <div class="card-body">
+              <p class="">
+                <b class="pr-1">Question {{i + 1}} :</b>
+                <span class="question" [innerHTML]="item.content"></span>
+              </p>
+              <ul class="list-aw">
+                <ng-container *ngIf="item.typeId === 4">
+                  <li *ngFor="let aw of item.options; let i = index">
+                    <input [id]="aw.id"
+                           class="mr-1"
+                           type="radio"
+                           [disabled]="timeout"
+                           [formControlName]="item.questionCode"
+                           [name]="item.questionCode"
+                           [value]="aw.id">
+                    <label [for]="aw.id" [innerHTML]="aw.content"></label>
+                  </li>
+                </ng-container>
+                <ng-container *ngIf="item.typeId === 1">
+                  <li *ngFor="let aw of item.options" [formGroupName]="item.questionCode">
+                    <input [id]="aw.id"
+                           class="mr-1"
+                           [disabled]="timeout"
+                           type="checkbox"
+                           [formControlName]="aw.id"
+                           [value]="true">
+                    <label [for]="aw.id" [innerHTML]="aw.content"></label>
+                  </li>
+                </ng-container>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

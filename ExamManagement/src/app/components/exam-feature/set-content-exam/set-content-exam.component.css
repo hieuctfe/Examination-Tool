@@ -1,0 +1,32 @@
+.btn-info {
+  background-color: #4ba89c !important; }
+
+.btn-warning i {
+  color: white; }
+
+.btn-secondary {
+  background-color: #20897b !important; }
+
+.box-contain {
+  min-height: 600px; }
+
+.main-title {
+  color: red; }
+
+.scroll-container {
+  overflow: auto;
+  height: 600px; }
+  .scroll-container p {
+    margin-bottom: 5px; }
+
+fieldset {
+  border: 2px solid #4ba89c !important; }
+  fieldset legend {
+    padding: 0 10px;
+    width: auto;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #20897b; }
+
+/*# sourceMappingURL=set-content-exam.component.css.map */

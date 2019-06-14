@@ -1,0 +1,36 @@
+.btn-info {
+  background-color: #4ba89c !important; }
+
+.btn-warning i {
+  color: white; }
+
+.btn-secondary {
+  background-color: #20897b !important; }
+
+.btn-secondary {
+  background: #20897b !important; }
+
+p {
+  margin-bottom: 0.5rem; }
+
+.question-box {
+  max-width: 80%;
+  padding-right: 1.5rem;
+  margin-right: auto; }
+  .question-box img {
+    width: 100% !important; }
+
+.button-box {
+  text-align: right; }
+
+.scroll-container {
+  max-height: 60vh;
+  overflow-y: auto; }
+
+.alert-contain {
+  position: fixed;
+  top: 10%;
+  right: 10%;
+  z-index: 999999999; }
+
+/*# sourceMappingURL=import.component.css.map */

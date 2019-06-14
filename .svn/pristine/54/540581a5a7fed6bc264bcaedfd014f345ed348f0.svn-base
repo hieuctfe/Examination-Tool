@@ -1,0 +1,101 @@
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {GlobalVariable} from '../global';
+import {HttpResponse} from 'selenium-webdriver/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExamService {
+
+  constructor(private http: HttpClient) {
+  }
+
+  generateBaseTest(data) {
+    return this.http.post(GlobalVariable.BASE_API + 'BaseTest/GenerateTestRandom', data);
+  }
+
+  generateBaseTestBaseOnChapter(data) {
+    return this.http.post(GlobalVariable.BASE_API + 'BaseTest/GenerateTest', data);
+  }
+
+  generateTestManufacturer(data) {
+    return this.http.post(GlobalVariable.BASE_API + 'BaseTest/GenerateTestManufacturer', data);
+  }
+
+  generateBaseTestBaseOnLearningOutcome(data) {
+    return this.http.post(GlobalVariable.BASE_API + 'BaseTest/LearningOutcome', data);
+  }
+
+  getBaseTestWaitForApproved() {
+    return this.http.get(GlobalVariable.BASE_API + 'BaseTest/Waiting');
+  }
+
+  getBaseTestApproveOrReject(data) {
+    return this.http.get(GlobalVariable.BASE_API +
+      'BaseTest/GetBaseTests?isApproved=' + (data.isApproved ? data.isApproved : null));
+  }
+
+  getResultTeacher(course, config) {
+    console.log(course);
+    return this.http.get(GlobalVariable.BASE_API +
+      'BaseTest/GetTeacherResult?courseCode='
+      + (course ? course : '')
+      + (config.pageSize ? '&pageSize=' + config.pageSize : '')
+      + (config.pageIndex ? '&pageIndex=' + config.pageIndex : '')
+      , {observe: 'response'});
+  }
+
+  getBaseTest(code) {
+    return this.http.get(GlobalVariable.BASE_API + 'BaseTest/Get?id=' + code);
+  }
+
+  swapQuestion(data) {
+    return this.http.post(GlobalVariable.BASE_API + 'BaseTest/ChangeQuestion', data);
+  }
+
+  editQuestionOnBaseTest(data) {
+    return this.http.post(GlobalVariable.BASE_API + 'BaseTest/EditQuestion', data);
+  }
+
+  approveExam(data) {
+    return this.http.get(GlobalVariable.BASE_API + 'BaseTest/Approve?id=' + data.id + '&isApprove=' + data.isApprove);
+  }
+
+  submitReviewExam(data) {
+    return this.http.post(GlobalVariable.BASE_API + 'Exam/SubmitReviewBaseTest', data);
+  }
+
+  retake(id) {
+    return this.http.get(GlobalVariable.BASE_API + 'BaseTest/ChangeStatusToGenerated?id=' + id);
+  }
+
+  publish(id) {
+    return this.http.get(GlobalVariable.BASE_API + 'BaseTest/Publish?id=' + id);
+  }
+
+  getPublish(code, course) {
+    return this.http.get(GlobalVariable.BASE_API + 'BaseTest/GetPublish?courseCode=' + course
+      + '&semesterCode=' + code);
+  }
+
+  getUpdateList(course, pageIndex, pageSize) {
+    return this.http.get<HttpResponse>(GlobalVariable.BASE_API + 'BaseTest/NeedApprover?courseCode='
+      + (course ? course : '')
+      + (pageSize ? '&pageSize=' + pageSize : '')
+      + (pageIndex ? '&pageIndex=' + pageIndex : '')
+      , {observe: 'response'});
+  }
+
+  getWaitToApprove(course, pageIndex, pageSize) {
+    return this.http.get<HttpResponse>(GlobalVariable.BASE_API + 'BaseTest/WaitToApprove?courseCode='
+      + (course ? course : '')
+      + (pageSize ? '&pageSize=' + pageSize : '')
+      + (pageIndex ? '&pageIndex=' + pageIndex : '')
+      , {observe: 'response'});
+  }
+
+  updateBaseTest(data) {
+    return this.http.put(GlobalVariable.BASE_API + 'BaseTest', data);
+  }
+}

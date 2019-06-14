@@ -1,0 +1,33 @@
+<div class="card">
+  <div class="card-body">
+    <h4 style="text-transform: uppercase">{{type}}</h4>
+    <form [formGroup]="form" (submit)="submit(form)">
+      <div class="form-group">
+        <label for="department">Department</label>
+        <input readonly type="text" class="form-control" formControlName="department" id="department"
+               placeholder="Department">
+        <div *ngIf="submitted && form.controls['department'].errors?.required" class="d-block invalid-feedback">
+          Department cannot be empty
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="code">Code</label>
+        <input [readonly]="type === 'edit'" type="text" class="form-control" id="code" formControlName="code" placeholder="Code">
+        <div *ngIf="submitted && form.controls['code'].errors?.required" class="d-block invalid-feedback">
+          Code cannot be empty
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" formControlName="name" placeholder="Name">
+        <div *ngIf="submitted && form.controls['name'].errors?.required" class="d-block invalid-feedback">
+          Name cannot be empty
+        </div>
+      </div>
+      <div class="d-flex mt-4 justify-content-end">
+        <button class="btn btn-info mr-2">Submit</button>
+        <button class="btn" type="button" (click)="modalRef.hide()">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,38 @@
+<nav class="navbar navbar-light bg-light mb-4 d-flex">
+  <div class="mr-auto"></div>
+  <form class="form-inline">
+    <input class="form-control mr-sm-2" type="search" placeholder="Nhập học kì" aria-label="Search">
+    <button class="btn btn-info my-2 my-sm-0" type="submit">Tìm kiếm</button>
+  </form>
+</nav>
+<div class="row">
+  <div *ngFor="let se of listSemester" class="col-md-3 col-sm-6 col-12 text-center mb-4">
+    <div routerLink="/View/Review/Course/{{se.code}}" class="card h-100">
+      <div class="card-body">
+        <h4>{{se.code}}</h4>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="d-flex">
+  <div class="mr-auto"></div>
+  <nav aria-label="Page navigation example">
+    <ul class="pagination">
+      <li class="page-item">
+        <a class="page-link" href="#">Previous</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="#">1</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="#">2</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="#">3</a>
+      </li>
+      <li class="page-item">
+        <a class="page-link" href="#">Next</a>
+      </li>
+    </ul>
+  </nav>
+</div>

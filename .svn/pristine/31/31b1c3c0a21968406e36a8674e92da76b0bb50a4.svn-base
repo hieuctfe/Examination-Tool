@@ -1,0 +1,96 @@
+<div class="card-body">
+  <div class="d-flex form-inline mb-4">
+    <div class="form-group mr-auto">
+      <h4>Swap Question</h4>
+    </div>
+    <div class="form-group">
+      <form (submit)="getQuestion(config.filter)">
+        <input name="search" [(ngModel)]="config.filter.searchValue" type="text"
+               class="form-control d-inline-block mr-2"
+               style="width: 250px" placeholder="Course Name or Question">
+        <button type="submit" class="btn btn-info">Search</button>
+      </form>
+    </div>
+  </div>
+  <table [ngClass]="(!config.data || config.data.length === 0) ? 'table': 'table  table-hover'">
+    <thead>
+    <tr>
+      <th>Code</th>
+      <th>Course</th>
+      <th>Level</th>
+      <th>Mark</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let q of config.data
+    | paginate: {
+      itemsPerPage: config.filter.itemsPerPage,
+      currentPage: config.filter.currentPage,
+      totalItems: config.filter.totalItems
+     };
+     let i = index ">
+      <tr *ngIf="currentIDs.indexOf(q.code) === -1">
+        <td>{{q.code}}</td>
+        <td>{{q.course}}</td>
+        <td>{{q.level}}</td>
+        <td>{{q.mark}}</td>
+        <td>
+          <button class="btn btn-warning  mr-2" (click)="get(q)" tooltip="Detail question">
+            <i class="ion ion-md-information-circle-outline"></i>
+          </button>
+          <button class="btn btn-danger  mr-2" (click)="swapQuestion(q.code)"
+                  tooltip="Swap with current question">
+            <i class="ion ion-md-swap"></i>
+          </button>
+        </td>
+      </tr>
+      <tr style="background: lightgray" [hidden]="!q.open">
+        <td colspan="6" class="p-4 hidden-row">
+          <div class="question-box">
+            <p>
+              <b>Question</b>:
+              <span [innerHTML]="q.content"></span>
+            </p>
+            <p>
+              <b>Options</b>:
+            </p>
+            <p *ngFor="let an of q.options; let index = index"
+               [ngClass]=" an.isCorrect ? 'text-danger font-weight-bold' : ''">
+              {{GlobalVariable.DATA_LIST[index]}}.
+              <span [innerHTML]="an.content"></span>
+            </p>
+          </div>
+        </td>
+      </tr>
+    </ng-container>
+    <ng-container *ngIf="!config.data || config.data.length === 0">
+      <tr>
+        <td colspan="6" class="text-center text-danger">Question Bank is empty</td>
+      </tr>
+    </ng-container>
+    </tbody>
+  </table>
+  <pagination-template #p="paginationApi" (pageChange)="setPage($event)">
+    <ul class="pagination text-right">
+      <li class="pagination-previous" [class.disabled]="p.isFirstPage()">
+        <a (click)="!p.isFirstPage() ? p.previous() : ''">
+          Previous
+        </a>
+      </li>
+      <li *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
+        <a (click)="p.setCurrent(page.value)" *ngIf="p.getCurrent() !== page.value">
+          <span>{{ page.label }}</span>
+        </a>
+        <a *ngIf="p.getCurrent() === page.value">
+          <span>{{ page.label }}</span>
+        </a>
+      </li>
+      <li class="pagination-next" [class.disabled]="p.isLastPage()">
+        <a (click)="!p.isLastPage ? p.next() : ''">
+          Next
+        </a>
+      </li>
+    </ul>
+  </pagination-template>
+</div>

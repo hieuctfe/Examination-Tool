@@ -1,0 +1,120 @@
+<div class="mt-4 mb-4">
+  <div class="row">
+    <div class="col-12 pl-0">
+      <ng-container *ngIf="course">
+        <h5 class="mb-4">Import Question Course <span class="text-danger">{{course}}</span></h5>
+        <div class="d-flex">
+          <div class="form-group mr-auto">
+            <input (change)="readFile($event)" #file type="file" class="d-none form-control-file border"
+                   [attr.accept]="docType + ', ' + xmlType + ', '+ gifType">
+            <button (click)="file.click()" class="btn btn-info mr-2">
+              <i class="ml-2 ion ion-md-cloud-upload  pr-2"></i>
+              Upload file
+            </button>
+            <button class="btn btn-secondary" (click)="openModal(null)">
+              <i class="ml-2 ion ion-md-add pr-2"></i>
+              Add question
+            </button>
+          </div>
+          <div>
+            <button class="btn btn-outline-secondary" [routerLink]="['../Manage']">
+              <i class="ion ion-md-list-box"></i> Manage Question </button>
+          </div>
+        </div>
+
+      </ng-container>
+      <tabset #tab *ngIf="!(resultTemplate.success.length == 0 && resultTemplate.error.length == 0)">
+        <tab [heading]="'Parsed Questions (' + resultTemplate.success.length + ')'">
+          <div class=" pt-4">
+            <h3 class="mb-4">Review</h3>
+            <div class="scroll-container">
+              <div *ngFor="let q of resultTemplate.success; let last = last; let i = index"
+                   [ngClass]="last ? '' : 'mb-4'">
+                <div class="card">
+                  <div class="card-body d-flex">
+                    <div class="question-box">
+                      <p>
+                        <b>Question {{i + 1}} </b>: <span [innerHTML]="q.content"></span>
+                      </p>
+                      <p><b>Options:</b></p>
+                      <p *ngFor="let an of q.options; let index = index"
+                         [ngClass]=" an.isCorrect ? 'text-danger font-weight-bold' : ''">
+                        {{GlobalVariable.DATA_LIST[index]}}. <span [innerHTML]="an.content"></span>
+                      </p>
+                      <p>
+                        <b>Mark</b>: {{q.mark}}
+                      </p>
+                      <p>
+                        <b>Level</b>: {{q.level}}
+                      </p>
+                      <p>
+                        <b>Chapter</b>: <span *ngFor="let c of q.chapters; let last = last">{{c}} <ng-container
+                        *ngIf="!last">,</ng-container></span>
+                      </p>
+                    </div>
+                    <div class="button-box">
+                      <button (click)="openModal(q, 'success')" class="btn btn-info mr-2">
+                        <i class="ion ion-md-create"></i>
+                      </button>
+                      <button (click)="destroy(i, 'success')" class="btn btn-danger">
+                        <i class="ion ion-md-close"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="pt-4 pb-4">
+              <button class="btn btn-info" (click)="submitQuestion()"
+                      [disabled]="!resultTemplate || resultTemplate.success.length == 0">Submit all parsed questions
+              </button>
+            </div>
+          </div>
+        </tab>
+        <tab [heading]="'Warning Questions (' + resultTemplate.error.length +')'">
+          <div class=" pt-4">
+            <h3 class="mb-4">Review</h3>
+            <div class="scroll-container">
+              <div *ngFor="let q of resultTemplate.error; let last = last; let i = index"
+                   [ngClass]="last ? '' : 'mb-4'">
+                <div class="card">
+                  <div class="card-body d-flex">
+                    <div class="question-box">
+                      <p>
+                        <b>Question {{i + 1}} </b>: <span [innerHTML]="q.content"></span>
+                      </p>
+                      <p *ngFor="let an of q.options; let index = index"
+                         [ngClass]=" an.isCorrect ? 'text-danger font-weight-bold' : ''">
+                        {{GlobalVariable.DATA_LIST[index]}}. <span [innerHTML]="an.content"></span>
+                      </p>
+                      <p>
+                        <b>Mark</b>: {{q.mark}}
+                      </p>
+                      <p>
+                        <b>Level</b>: {{q.level}}
+                      </p>
+                      <p>
+                        <b>Chapter</b>: <span *ngFor="let c of q.chapters; let last = last">{{c}} <ng-container
+                        *ngIf="!last">,</ng-container></span>
+                      </p>
+                    </div>
+                    <div class="button-box">
+                      <button (click)="openModal(q, 'error')" class="btn btn-info mr-2">
+                        <i class="ion ion-md-create"></i>
+                      </button>
+                      <button (click)="destroy(i, 'error')" class="btn btn-danger">
+                        <i class="ion ion-md-close"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </tab>
+      </tabset>
+      <h5 *ngIf="messageCourse.isShow" class="pt-4 pb-4 text-center text-danger">{{messageCourse.message}}</h5>
+    </div>
+  </div>
+</div>
+

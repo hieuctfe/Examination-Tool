@@ -1,0 +1,54 @@
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {DateTimeAdapter, OWL_DATE_TIME_FORMATS, OWL_DATE_TIME_LOCALE} from 'ng-pick-datetime';
+import {MomentDateTimeAdapter} from 'ng-pick-datetime-moment';
+import {SettingCourse} from '../../../model/setting-course.model';
+import {Exam} from '../../../model/exam.model';
+import {SemesterService} from '../../../services/semester.service';
+import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {UserService} from '../../../services/user.service';
+
+export const MY_CUSTOM_FORMATS = {
+  parseInput: 'DD/MM/YYYY - HH:mm',
+  fullPickerInput: 'DD/MM/YYYY - HH:mm',
+};
+
+@Component({
+  selector: 'Mex-setting-exam',
+  templateUrl: './setting-exam.component.html',
+  styleUrls: ['./setting-exam.component.scss'],
+  providers: [
+    {provide: DateTimeAdapter, useClass: MomentDateTimeAdapter, deps: [OWL_DATE_TIME_LOCALE]},
+    {provide: OWL_DATE_TIME_FORMATS, useValue: MY_CUSTOM_FORMATS},
+    {provide: OWL_DATE_TIME_LOCALE, useValue: 'vi'},
+  ],
+})
+export class SettingExamComponent implements OnInit {
+  @Input() exam: Exam;
+  @Input() form: FormGroup;
+  @Output() formChange: EventEmitter<FormGroup> = new EventEmitter<FormGroup>();
+  submitted = false;
+
+  constructor(private semesterSV: SemesterService, private userSV: UserService, private fb: FormBuilder) {
+  }
+
+  ngOnInit() {
+    console.log(this.exam);
+    if (!(this.exam.settingCourse && Object.keys(this.exam.settingCourse).length > 0)) {
+      this.exam.settingCourse = new SettingCourse().deserialize({});
+    }
+    this.form = this.fb.group({
+      duration: new FormControl(this.exam.settingCourse.duration ?
+        this.exam.settingCourse.duration : 1, [Validators.required, Validators.min(1), Validators.max(23 * 60 + 59)]),
+      numberOfQuesion: new FormControl(this.exam.settingCourse.numberOfQuesion ?
+        this.exam.settingCourse.numberOfQuesion : 1, [Validators.required, Validators.min(1)]),
+      numberOfTest: new FormControl(this.exam.settingCourse.numberOfTest ?
+        this.exam.settingCourse.numberOfTest : 2, [Validators.required, Validators.min(2)])
+    });
+    this.formChange.emit(this.form);
+  }
+
+  public changeSub(val) {
+    this.submitted = val;
+  }
+
+}

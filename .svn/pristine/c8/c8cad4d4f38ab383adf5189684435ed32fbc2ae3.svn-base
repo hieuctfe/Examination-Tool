@@ -1,0 +1,81 @@
+import {Injectable} from '@angular/core';
+import {ActivatedRoute, ActivatedRouteSnapshot, CanActivate, CanActivateChild, Router, RouterStateSnapshot} from '@angular/router';
+import {UserService} from './user.service';
+import {GlobalVariable} from '../global';
+import {AuthenService} from './authen.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthenGuardService implements CanActivate, CanActivateChild {
+
+  role_list = GlobalVariable.ROLE_LIST;
+
+  constructor(private router: Router, private userSV: UserService, private authSV: AuthenService) {
+  }
+
+  async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+    let isLogin = false;
+    let user = this.userSV.getUser;
+    if (!user) {
+      isLogin = await this.authSV.getUserFromServer();
+    } else {
+      isLogin = true;
+    }
+    if (isLogin) {
+      user = this.userSV.getUser;
+      const listRole = route.data.role as Array<any>;
+      if (listRole) {
+        let isAccess = false;
+        listRole.forEach(el => {
+          user.roles.forEach(r => {
+            if (el === r) {
+              isAccess = true;
+            }
+          });
+        });
+        if (!isAccess) {
+          this.router.navigate(['/View']);
+          return false;
+        }
+      }
+      return true;
+    }
+    this.router.navigate(['/Login']);
+    this.userSV.logout();
+    return false;
+  }
+
+  async canActivateChild(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+    let isLogin = false;
+    let user = this.userSV.getUser;
+    if (!user) {
+      isLogin = await this.authSV.getUserFromServer();
+    } else {
+      isLogin = true;
+    }
+    if (isLogin) {
+      user = this.userSV.getUser;
+      const listRole = route.data.role as Array<any>;
+      if (listRole) {
+        let isAccess = false;
+        listRole.forEach(el => {
+          user.roles.forEach(r => {
+            if (el === r) {
+              isAccess = true;
+            }
+          });
+        });
+        if (!isAccess) {
+          this.router.navigate(['/View']);
+          return false;
+        }
+      }
+      return true;
+    }
+    this.router.navigate(['/Login']);
+    this.userSV.logout();
+    return false;
+  }
+
+}

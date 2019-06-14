@@ -1,0 +1,55 @@
+<div class="row" *ngIf="exam">
+  <div class="box-container col-md-6">
+    <div class="card w-100">
+      <div class="card-body p-4">
+        <h5 class="card-title d-flex">
+          Content of Exam
+          <span class="mr-auto"></span>
+          {{exam.listQuestion.length + '/' + exam.settingCourse.numberOfQuesion}}
+        </h5>
+        <div class="box-contain"
+             #scrollDiv
+             mwlDroppable
+             (drop)="addData($event.dropData)">
+          <div *ngFor="let q of exam.listQuestion" class=" card mb-4">
+            <Mex-question [type]="'question'" [question]="q" (destroy)="destroy($event)"></Mex-question>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="box-container col-md-6">
+    <div class="card">
+      <div class="card-body p-4">
+        <h5 class="card-title">
+          List of question:
+        </h5>
+        <div class="scroll-container">
+          <div *ngFor="let el of exam.listLOC" class="mb-4">
+            <fieldset class="p-4 border-dark border">
+              <legend>{{el.name}}</legend>
+              <div *ngIf="el.config && el.questions?.length > 0" class="form-inline mb-4">
+                <div class="w-100">
+                  <label class="sr-only" [for]="'level' + el.name">Level</label>
+                  <select class="form-control w-100" [name]="'level' + el.name"
+                          (ngModelChange)="changeLevel($event, el)" [ngModel]="el.config.level">
+                    <option [value]="null">All</option>
+                    <option *ngFor="let l of levels; let i = index" [value]="l.id">{{l.name}} - Level {{i}}</option>
+                  </select>
+                </div>
+              </div>
+              <div *ngFor="let q of el.questions; let last = last">
+                <Mex-question *ngIf="checkIndex(q.code) === -1" [ngClass]="last ? 'card pointer' : 'card pointer mb-4'"
+                              mwlDraggable [type]="'data'" [dropData]="q" [question]="q"></Mex-question>
+              </div>
+              <div *ngIf="el.config && el.config.totalElement !== el.questions.length"
+                   (click)="loadMore(el)"
+                   class="w-100 pointer border-1 border-dark text-center p-1 pt-4">Load more...
+              </div>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

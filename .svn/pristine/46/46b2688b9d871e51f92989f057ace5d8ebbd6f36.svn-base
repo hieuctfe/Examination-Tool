@@ -1,0 +1,116 @@
+<form [formGroup]="form" (ngSubmit)="submit(form)">
+  <div class="row">
+    <div class="col-12">
+      <tabset>
+        <tab heading="Question Config">
+          <div class="row">
+            <div class="col-10">
+              <div class="form-group">
+                <label for="chapter">Chapters</label>
+                <ng-multiselect-dropdown
+                  id="chapter"
+                  [data]="chapter"
+                  [settings]="dropdownSetting"
+                  formControlName="chapters">
+                </ng-multiselect-dropdown>
+                <div *ngIf="submitted && form.controls['chapters'].errors?.required" class="d-block invalid-feedback">
+                  Chapters cannot be empty
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="learningOutcomes">Learning Outcomes</label>
+                <ng-multiselect-dropdown
+                  id="learningOutcomes"
+                  [data]="lo"
+                  [settings]="dropdownSetting"
+                  formControlName="learningOutcomes">
+                </ng-multiselect-dropdown>
+              </div>
+            </div>
+            <div class="col-2">
+              <div class="form-group">
+                <label for="level">Level</label>
+                <select class="form-control" formControlName="level" id="level">
+                  <option *ngFor="let l of level" [value]="l.id">{{l.name}}</option>
+                </select>
+                <div *ngIf="submitted && form.controls['mark'].errors?.required" class="d-block invalid-feedback">
+                  Level cannot be null
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="mark">Mark</label>
+                <input type="number" class="form-control" formControlName="mark" id="mark">
+                <div *ngIf="submitted && form.controls['mark'].errors?.required" class="d-block invalid-feedback">
+                  Mark cannot be null
+                </div>
+              </div>
+            </div>
+          </div>
+        </tab>
+        <tab heading="Question Detail">
+          <div class="form-group " style="padding: 2px">
+            <label>Question</label>
+            <div #note [ngxSummernote]="config" [summernoteModel]="form.controls['content'].value"
+                 (summernoteModelChange)="setModal($event)">
+            </div>
+            <div *ngIf="submitted && form.controls['content'].errors?.required" class="d-block invalid-feedback">
+              Question Content cannot be empty
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <label>Options
+                <button class="btn btn-info" type="button" (click)="addItem()">
+                  <i class="ion ion-md-add"></i>
+                </button>
+              </label>
+            </div>
+            <div class="col-6" *ngFor="let ans of formData.controls; let i = index">
+              <div class="form-group">
+                <div formArrayName="options">
+                  <div [formGroupName]="i" class="d-flex align-items-center mb-4">
+                    <span class="pr-2">{{GlobalVariable.DATA_LIST[i] + '. '}}</span>
+                    <input class="mr-2" formControlName="isCorrect" type="checkbox"
+                           tooltip="check for true answers">
+                    <input type="number" formControlName="percent" class="form-control mr-2"
+                           style="width: 80px"
+                           [ngClass]="(form.controls['options'].controls[i].controls.percent.errors?.min
+                   || form.controls['options'].controls[i].controls.percent.errors?.max) ? 'invalid' : ''"
+                           tooltip="% of mark, default divine for all answer">
+                    <div class="input-group" style="padding: 2px 5px">
+                      <div [ngxSummernote]="config" (summernoteModelChange)="setModal($event, i)"
+                           [summernoteModel]="form.controls['options'].controls[i].controls['content'].value"></div>
+                      <div *ngIf="form.controls['options'].controls.length >= 2" class="input-group-prepend"
+                           (click)="removeItem(i)">
+                        <div class="input-group-text" tooltip="Remove this option">
+                          <i class="ion ion-md-close"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-12">
+              <div *ngIf="submitted && form.controls['options'].errors?.OptionsChecked"
+                   class="d-block invalid-feedback">
+                Must have at least 2 options and 1 right options
+              </div>
+              <div *ngIf="submitted && form.controls['options'].errors?.PercentChecked"
+                   class="d-block invalid-feedback">
+                % Mark is not right
+              </div>
+            </div>
+          </div>
+        </tab>
+      </tabset>
+    </div>
+    <div class="col-12">
+
+    </div>
+  </div>
+  <div class="text-right">
+    <button class="btn btn-info">Save</button>
+    <button type="button" (click)="modalRef.hide()" class="btn ml-2">Cancel</button>
+  </div>
+</form>

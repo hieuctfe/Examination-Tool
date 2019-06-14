@@ -1,0 +1,116 @@
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Exam} from '../../../model/exam.model';
+import {ExamService} from '../../../services/exam.service';
+import * as moment from 'moment';
+import swal from 'sweetalert2';
+
+@Component({
+  selector: 'Mex-setting-lo',
+  templateUrl: './setting-lo.component.html',
+  styleUrls: ['./setting-lo.component.scss']
+})
+export class SettingLOComponent implements OnInit {
+  @Input() exam: Exam;
+  @Input() listLO: any[] = [];
+  @Input() listChapter: any[] = [];
+  @Output() examChange = new EventEmitter();
+  listTotal = [];
+  type = 'lo';
+
+  constructor(private examSV: ExamService) {
+  }
+
+  ngOnInit() {
+    console.log(this.listLO);
+    this.exam.listLOC = new Array<any>();
+  }
+
+  setDefault(type) {
+    if (this.type === 'lo') {
+      this.listChapter.map(el => el.checked = false);
+    } else {
+      this.listLO.map(el => el.checked = false);
+    }
+    this.listTotal = [];
+    this.type = type;
+  }
+
+  addToList(data) {
+    if (data.checked) {
+      this.listTotal.push(data.id);
+    } else {
+      const index = this.listTotal.indexOf(data.id);
+      if (index !== -1) {
+        this.listTotal.splice(index, 1);
+      }
+    }
+  }
+
+  setAll() {
+    if (this.type === 'lo') {
+      this.listTotal = this.listLO.map(el => el.id);
+      this.listLO.map(el => el.checked = !el.checked);
+    } else {
+      this.listTotal = this.listChapter.map(el => el.id);
+      this.listChapter.map(el => el.checked = !el.checked);
+    }
+  }
+
+  isSelectedAll() {
+    return this.type === 'lo'
+      ? this.getCheckedSelect().length === this.listLO.length
+      : this.getCheckedSelect().length === this.listChapter.length;
+  }
+
+  getCheckedSelect() {
+    if (this.type === 'lo') {
+      return this.listLO.filter(el => el.checked === true);
+    }
+    return this.listChapter.filter(el => el.checked === true);
+  }
+
+  createExam(type: string) {
+    const hour = Math.floor(this.exam.settingCourse.duration / 60);
+    const minute = (this.exam.settingCourse.duration % 60);
+    const data = {
+      numberOfTest: this.exam.settingCourse.numberOfTest,
+      numberOfQuestion: this.exam.settingCourse.numberOfQuesion,
+      courseCode: this.exam.course[0].code,
+      duration: (hour >= 10 ? hour : '0' + hour)
+      + ':' + (minute >= 10 ? minute : '0' + minute) + ':00',
+      learningOutcomes: [],
+      chapters: []
+    };
+    if (type === 'lo') {
+      data['learningOutcomes'] = this.listTotal;
+    } else {
+      data['chapters'] = this.listTotal;
+    }
+
+    this.examSV.generateBaseTestBaseOnChapter(data).subscribe(() => {
+      this.exam.typeExam = 'random';
+      this.examChange.emit({
+        type: 'random',
+        step: 3,
+        finalData: data
+      });
+      this.exam = new Exam();
+    }, (er) => {
+      if (er.error && er.error.modelState) {
+        swal('Error', er.error.modelState[''][0] ? er.error.modelState[''][0] : 'Some errors has occurred', 'error');
+      } else {
+        swal('Error', 'Some errors has occurred', 'error');
+      }
+    });
+  }
+
+  verifyStep() {
+    this.exam.typeExam = this.type;
+    this.exam.listLOC = this.getCheckedSelect();
+    this.examChange.emit({
+      type: this.type,
+      step: 4
+    });
+  }
+
+}

@@ -1,0 +1,146 @@
+<tabset>
+  <tab *ngIf="user?.roles.indexOf('Lecturer') !== -1" heading="Waiting Exam" (select)="loadTestBaseOnCode('wait')"></tab>
+  <!--<tab heading="Approved / Reject Exam" (select)="loadTestBaseOnCode('approve')"></tab>-->
+  <tab *ngIf="user?.roles.indexOf('Manager') !== -1" heading="Release the Test"
+       (select)="loadTestBaseOnCode('release')"></tab>
+</tabset>
+<div *ngIf="tab === 'approve'" class="form-inline mt-4">
+  <label for="filter" class="pr-4">Filter By</label>
+  <select id="filter" class="form-control" [ngModel]="isApproved"
+          (ngModelChange)="loadTestBaseOnCode('approve', $event)">
+    <option [value]="null">All</option>
+    <option [value]="true">Approve</option>
+    <option [value]="false">Reject</option>
+  </select>
+</div>
+<ng-container *ngIf="tab === 'release'">
+  <div class="form-inline mb-4 mt-4">
+    <label class="d-block" class="pr-4">
+      <b>Course</b>
+    </label>
+    <ng-multiselect-dropdown style="min-width: 200px" [placeholder]="'Select a Course'" [data]="courses"
+                             [(ngModel)]="selectedCourse"
+                             (onSelect)="changeCourse($event)" [settings]="courseSetting">
+    </ng-multiselect-dropdown>
+  </div>
+  <div class="form-inline mb-4">
+    <label for="total">Show
+      <select [ngModel]="config.pageSize" (ngModelChange)="changeSize($event)" name="total" id="total"
+              class="mr-2 ml-2 form-control">
+        <option *ngFor="let s of sizes" [value]="s">{{s}}</option>
+      </select>
+      of {{config.totalElement}} items.
+    </label>
+  </div>
+</ng-container>
+<table class="mt-4" [ngClass]="(!baseTests || baseTests.length === 0) ? 'table': 'table  table-hover'">
+  <ng-container *ngIf="tab == 'wait' || tab ==='approve'">
+    <thead>
+    <tr>
+      <th>Course</th>
+      <th>Start Date</th>
+      <th>End Date</th>
+      <th>Duration</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let q of baseTests  | paginate: {
+      itemsPerPage: config.pageSize,
+      currentPage: config.pageIndex,
+      totalItems: config.totalElement
+     }; let i = index ">
+      <tr>
+        <td>{{q.course}}</td>
+        <td>{{q.startDate | date: 'dd/MM/yyyy - hh:mm'}}</td>
+        <td>{{q.endDate | date: 'dd/MM/yyyy - hh:mm'}}</td>
+        <td>{{q.duration}}</td>
+        <td>
+          <ng-container [ngSwitch]="q.status">
+            <ng-container *ngSwitchCase="0">
+                <span [ngSwitch]="q.outOfDate">
+                  <b class="text-warning" *ngSwitchCase="'soon'">
+                      Not available
+                  </b>
+                  <b class="text-danger" *ngSwitchCase="'out'">
+                      Out of date
+                  </b>
+                  <b *ngSwitchDefault>
+                      Pending
+                  </b>
+                </span>
+            </ng-container>
+            <ng-container *ngSwitchCase="1"><b>Taken</b></ng-container>
+            <ng-container *ngSwitchCase="2"><b>Edited</b></ng-container>
+            <ng-container *ngSwitchCase="3"><b class="text-success">Approved</b></ng-container>
+            <ng-container *ngSwitchCase="4"><b class="text-danger">Rejected</b></ng-container>
+          </ng-container>
+        </td>
+        <td>
+          <button *ngIf="(q.status == 0  &&  q.outOfDate == 'wait') || q.status == 2 || q.status == 1"
+                  [routerLink]="['../Detail', q.id]"
+                  class="btn btn-info" tooltip="Detail">
+            <i class="ion ion-md-information-circle-outline"></i>
+          </button>
+        </td>
+      </tr>
+    </ng-container>
+    <ng-container *ngIf="!baseTests || baseTests.length === 0">
+      <tr>
+        <td colspan="6" class="text-center text-danger">There is no test now</td>
+      </tr>
+    </ng-container>
+    </tbody>
+  </ng-container>
+  <ng-container *ngIf="tab == 'release'">
+    <thead>
+    <tr>
+      <th>Test Exam Id</th>
+      <th>Approver</th>
+      <th>Mark</th>
+      <th>Publish</th>
+    </tr>
+    </thead>
+    <tbody>
+    <ng-container *ngFor="let q of baseTests; let i = index">
+      <tr>
+        <td>{{q.uiId}}</td>
+        <td>{{q.approveBy}}</td>
+        <td>{{q.mark}}</td>
+        <td>
+          <material-slide-toggle [name]="q.id" (change)="toggleStatus($event, q)" [checked]="q.isPublish">
+          </material-slide-toggle>
+        </td>
+    </ng-container>
+    <ng-container *ngIf="!baseTests || baseTests.length === 0">
+      <tr>
+        <td colspan="6" class="text-center text-danger">There is no test now</td>
+      </tr>
+    </ng-container>
+    </tbody>
+  </ng-container>
+</table>
+<pagination-template *ngIf="tab == 'release'" #p="paginationApi" (pageChange)="setPage($event)">
+  <ul class="pagination text-right">
+    <li class="pagination-previous" [class.disabled]="p.isFirstPage()">
+      <a (click)="!p.isFirstPage() ? p.previous() : ''">
+        Previous
+      </a>
+    </li>
+    <li *ngFor="let page of p.pages" [class.current]="p.getCurrent() === page.value">
+      <a (click)="p.setCurrent(page.value)" *ngIf="p.getCurrent() !== page.value">
+        <span>{{ page.label }}</span>
+      </a>
+      <a *ngIf="p.getCurrent() === page.value">
+        <span>{{ page.label }}</span>
+      </a>
+    </li>
+    <li class="pagination-next" [class.disabled]="p.isLastPage()">
+      <a (click)="!p.isLastPage ? p.next() : ''">
+        Next
+      </a>
+    </li>
+  </ul>
+</pagination-template>
+

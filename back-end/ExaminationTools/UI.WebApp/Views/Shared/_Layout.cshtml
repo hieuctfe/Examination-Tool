@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Examination</title>
+    <link href="@Url.AppCustoms("css/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@Url.AppCustoms("css/style.css")" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    <div class="contain-all">
+        <header class="row">
+            <div class="logo col-md-3">
+                <img src="@Url.AppCustoms("img/img-logo-fe.jpg")" alt="">
+            </div>
+            <div class="student-info col-md-9 row">
+                <ul class="col-md-7">
+                    @if (ViewBag.StudentName != null)
+                    {
+                        <li><label for="">Name: </label><b>@ViewBag.StudentName</b></li>
+                    }
+                    @if (ViewBag.StudentCode != null)
+                    {
+                        <li><label for="">Code: </label><b id="studentCode">@ViewBag.StudentCode</b></li>
+                    }
+                    @if (ViewBag.SubjectCode != null)
+                    {
+                        <li><label for="">Subject: </label><b>@ViewBag.SubjectCode</b></li>
+                    }
+                </ul>
+                <div class="col-md-5 exam-timing">
+                    <ul>
+                        <li id="timer"></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+        @RenderBody()
+    </div>
+    <script src="@Url.AppCustoms("js/jquery-3.3.1.min.js")"></script>
+    <script src="@Url.AppCustoms("js/bootstrap.js")"></script>
+    <script src="@Url.AppCustoms("js/jquery.signalR-2.3.0.min.js")"></script>
+    @RenderSection("PreScripts", required: false)
+    <script src="@Url.AppCustoms("js/timer.js")"></script>
+    <script src="@Url.AppCustoms("js/main.js")"></script>
+    <script src="@Url.AppCustoms("js/signalr.imple.js")"></script>
+    @RenderSection("Scripts", required: false)"
+</body>
+</html>

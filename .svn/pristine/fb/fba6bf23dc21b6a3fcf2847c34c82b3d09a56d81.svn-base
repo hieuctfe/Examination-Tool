@@ -1,0 +1,20 @@
+<div class="p-4">
+  <h5>{{type.toLocaleUpperCase()}}</h5>
+  <form [formGroup]="form" (ngSubmit)="submit(form)">
+    <div class="form-group">
+      <label for="content">Code</label>
+      <input readonly type="text" class="form-control" formControlName="courseCode">
+    </div>
+    <div class="form-group">
+      <label for="content">Content</label>
+      <textarea type="text" class="form-control" formControlName="name" id="content" placeholder=""></textarea>
+      <div *ngIf="submitted && form.controls['name'].errors?.required" class="d-block invalid-feedback">
+        Content cannot be empty
+      </div>
+    </div>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2">{{type === 'create' ? 'Create': 'Edit'}}</button>
+      <button type="button" class="btn" (click)="modalRef.hide()">Cancel</button>
+    </div>
+  </form>
+</div>

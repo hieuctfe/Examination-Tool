@@ -1,0 +1,640 @@
+import {Injectable} from '@angular/core';
+import DocXTemplater from 'docxtemplater';
+import JSZipUtils from 'node_modules/jszip-utils';
+import JSZip from 'jszip';
+import peg from 'node_modules/pegjs';
+import ObjTree from 'node_modules/objtree';
+import * as XLSX from 'node_modules/xlsx';
+import * as CryptoJS from 'crypto-js';
+import {QuestionMultipleChoice} from '../model/question-multichoice.model';
+import {HttpClient} from '@angular/common/http';
+
+@Injectable()
+export class ParserService {
+  cacheFile = null;
+  JSZip: JSZip;
+  DocXTemplater: DocXTemplater;
+  peg: peg;
+  ObjTree: ObjTree;
+
+  constructor(private http: HttpClient) {
+  }
+
+  getJSZip(content) {
+    return new JSZip(content);
+  }
+
+  getDocXTemplater() {
+    return new DocXTemplater();
+  }
+
+  readFileDocx(file, callback) {
+    this.loadFile(URL.createObjectURL(file), callback);
+  }
+
+  loadFile(url, callback) {
+    JSZipUtils.getBinaryContent(url, callback);
+  }
+
+  parseDocx(resultTemplate, t, te) {
+    let question_rex = /\[~QNCB=\d*~\]/g;
+
+    if (t === '2') {
+      question_rex = /pn=\d*/mgi;
+    }
+
+    const questions = te.split(question_rex);
+
+    switch (t) {
+      case '1':
+        return this.parseWordMC(questions, resultTemplate);
+      case '2':
+        break;
+      case '3':
+        // Matching
+        for (let i = 1; i < questions.length; i++) {
+          const el = questions[i];
+          const question = el.split(/\[CASE\]|MARK:/);
+          // console.log(question[0]);
+          for (let j = 1; j < question.length - 1; j++) {
+            const temp = question[j].trim().split(/\[[\S]\] /);
+            // console.log(temp[1] + " - " + temp[2]);
+          }
+          // console.log("mark is: " + question[question.length-1].trim());
+
+        }
+        break;
+      case '4':
+        // INDICATE
+        for (let i = 1; i < questions.length; i++) {
+          const el = questions[i];
+          const question = el.split('ANSWER:');
+          // console.log(question[0]);
+          const anwser = question[1].split('MARK:');
+          // console.log(anwser[0]);
+          const mark = anwser[1].split('UNIT');
+          // console.log(mark[0]);
+        }
+        break;
+      case '5':
+        // Fill Bank<
+        break;
+      default:
+        alert('Error');
+    }
+  }
+
+  parseWordMC(questions, resultTemplate) {
+    let s = 0;
+    let e = 0;
+    let w = 0;
+    const success = resultTemplate.success;
+    const error = resultTemplate.error;
+    questions.forEach((el, index) => {
+      let rex = /\[~QNCB=\d*~\]|\[~CASE(.*?)CASE~\]|\[~ANSWER:~\]|\[~MARK:~\]|\[~UNIT:~\]|\[~LEVEL:~\]|\[~CHAPTER:~\]/g;
+      const rex_result = this.removeEmptyNull(el.split(rex));
+      if (rex_result[1]) {
+        try {
+          rex = /\[~OPT=\w*~\]/g;
+          let options = this.removeEmptyNull(rex_result[1].split(rex));
+          options = options.map(e => {
+            return {
+              content: e,
+              percent: 0,
+              isCorrect: this.checkMultiChoice(rex_result[2], e)
+            };
+          });
+          const chapters = this.removeEmptyNull(rex_result[5].split(','));
+          const question = new QuestionMultipleChoice().deserialize({
+            content: rex_result[0],
+            mark: Number.parseFloat(rex_result[3]),
+            type: 1,
+            level: Number.parseInt(rex_result[4]),
+            isExam: true,
+            options: options,
+            chapters: chapters,
+            learningOutcomes: []
+          });
+          const isSuccess = this.veryfiContentQuestion(question);
+          if (isSuccess) {
+            question.code = this.guidGenerator();
+            success.push(question);
+            ++s;
+          } else {
+            question.code = this.guidGenerator();
+            error.push(question);
+            ++w;
+          }
+        } catch (er) {
+          console.log('Có lỗi tại câu hỏi: ' + rex_result[0]);
+          ++e;
+        }
+      }
+    });
+    resultTemplate.success.concat(success);
+    resultTemplate.error.concat(error);
+    return {
+      template: resultTemplate,
+      model: {
+        s: s,
+        e: e,
+        w: w
+      }
+    };
+  }
+
+  async parseGIF(text, resultTemplate) {
+    const that = this;
+    if (!this.cacheFile) {
+      this.cacheFile = await this.http.get('assets/js/GIFT.txt', {responseType: 'text'}).toPromise();
+    }
+    if (this.cacheFile) {
+      try {
+        let s = 0;
+        let e = 0;
+        let w = 0;
+        this.peg = peg;
+        const parser = this.peg.generate(this.cacheFile);
+        const result_parser = parser.parse(text);
+        const success = resultTemplate.success;
+        const error = resultTemplate.error;
+        const questions = [];
+        const promises = [];
+        if (result_parser) {
+          const rex = /<xml>(.*?)<\/xml>|<!--(.*)(<\w.*)/g;
+          result_parser.forEach(async (el) => {
+            try {
+              let content = this.removeEmptyNull(el.stem.text.split(rex));
+              content = content.length > 2 ? content[1] : content[0];
+              if (el.type === 'TF') {
+                let question = new QuestionMultipleChoice().deserialize({
+                  content: content.replace(/\\n/g, ''),
+                  type: 1,
+                  mark: 1,
+                  level: 1,
+                  isExam: true,
+                  options: [
+                    {
+                      content: 'True',
+                      percent: el.isTrue ? 100 : -100,
+                      isCorrect: el.isTrue
+                    },
+                    {
+                      content: 'False',
+                      percent: !el.isTrue ? 100 : -100,
+                      isCorrect: !el.isTrue
+                    }
+                  ],
+                  learningOutcomes: [],
+                  chapters: el.title.split('-')[0].split(',').map(d => {
+                    return Number.parseInt(this.removeEmptyNull(d.split(/^U/))[0].trim());
+                  })
+                });
+                question = this.changeType(question);
+                promises.push(this.veryfiContentQuestion(question));
+                questions.push(question);
+              } else if (el.type === 'MC') {
+                let question = new QuestionMultipleChoice().deserialize({
+                  content: content.replace(/\\n/g, ''),
+                  type: 1,
+                  mark: 1,
+                  level: 1,
+                  isExam: true,
+                  options: el.choices.map(l => {
+                    if (l.text.text.match(/^%[+-]?([0-9]*[.])?[0-9]+%/g)) {
+                      const slipt_answer = this.removeEmptyNull(l.text.text.split(/^%[+-]?([0-9]*[.])?[0-9]+%/g));
+                      return {
+                        content: slipt_answer[1],
+                        percent: Number.parseFloat((/^%[-]?\d+\.\d+%/).exec(l.text.text)['0'].replace(/%/g, '')),
+                        isCorrect: l.isCorrect
+                      };
+                    }
+                    return {
+                      content: l.text.text,
+                      percent: (l.weight !== null) ? l.weight : 0,
+                      isCorrect: !!l.isCorrect
+                    };
+                  }),
+                  learningOutcomes: [],
+                  chapters: el.title.split('-')[0].split(',').map(e => {
+                    return Number.parseInt(this.removeEmptyNull(e.split(/^U/))[0].trim());
+                  })
+                });
+                question = this.changeType(question);
+                promises.push(this.veryfiContentQuestion(question));
+                questions.push(question);
+                console.log(question);
+              }
+            } catch (er) {
+              console.log('Có lỗi ở câu : ' + el.stem.text);
+              ++e;
+            }
+          });
+          return await Promise.all(promises).then((array) => {
+            array.forEach((isSuccess, index) => {
+              if (isSuccess) {
+                questions[index].code = this.guidGenerator();
+                resultTemplate.success.push(questions[index]);
+                ++s;
+              } else {
+                questions[index].code = this.guidGenerator();
+                resultTemplate.error.push(questions[index]);
+                ++w;
+              }
+            });
+            return {
+              template: resultTemplate,
+              model: {
+                s: s,
+                w: w,
+                e: e
+              }
+            };
+          });
+        }
+      } catch (e) {
+        console.log(e);
+        alert('Cant parse this file');
+      }
+    }
+    return {
+      template: null,
+      model: null
+    };
+  }
+
+  changeType(question) {
+    if (question.type === 1 || question.type === 4) {
+      const options = question.options.filter(el => el.isCorrect === true);
+      if (options.length >= 2) {
+        question.type = 1;
+      } else if (options.length < 2) {
+        question.type = 4;
+      }
+      console.log(question);
+    }
+    return question;
+  }
+
+  async parseXMLtoJson(text, resultTemplate) {
+    let s = 0;
+    let e = 0;
+    let w = 0;
+    try {
+      const parser = new ObjTree();
+      const result = parser.parseXML(text);
+      const rq = result.quiz.question;
+      if (rq) {
+        if (Array.isArray(rq)) {
+          const wait = [];
+          const questions = [];
+          rq.forEach(async q => {
+            const parseChapter = q.name.text.split('-')[0].split(',').map(e => {
+              return Number.parseInt(this.removeEmptyNull(e.split(/^U/))[0].trim());
+            });
+            try {
+              const options = q.answer.map((el) => {
+                return {
+                  content: this.parseContent(el.text),
+                  percent: Number.parseFloat(el['-fraction']),
+                  isCorrect: Number.parseFloat(el['-fraction']) > 0
+                };
+              });
+              let content = q.questiontext.text;
+              if (q.questiontext.file && q.questiontext.file['#text']) {
+                const rex = /src="(.*?)"/g;
+                content = content.replace(rex, 'src="data:image/jpeg;base64,' + q.questiontext.file['#text'] + '"');
+              }
+              let question = new QuestionMultipleChoice().deserialize({
+                content: this.parseContent(content),
+                options: options,
+                mark: Number.parseFloat(q.defaultgrade),
+                type: 1,
+                chapters: parseChapter.map(el => {
+                  if (Number.isInteger(el) === true) {
+                    return el;
+                  }
+                }),
+                level: 1,
+                learningOutcomes: []
+              });
+              question = this.changeType(question);
+              wait.push(this.veryfiContentQuestion(question));
+              questions.push(question);
+            } catch (er) {
+              console.log(er);
+              e++;
+            }
+          });
+          return await Promise.all(wait).then(r => {
+            r.forEach((isSuccess, i) => {
+              if (isSuccess) {
+                questions[i].code = this.guidGenerator();
+                resultTemplate.success.push(questions[i]);
+                ++s;
+              } else {
+                questions[i].code = this.guidGenerator();
+                resultTemplate.error.push(questions[i]);
+                ++w;
+              }
+            });
+            return {
+              template: resultTemplate,
+              model: {
+                s: s,
+                w: w,
+                e: e
+              }
+            };
+          });
+        } else {
+          const parseChapter = rq.name.text.split('-')[0].split(',').map(e => {
+            return Number.parseInt(this.removeEmptyNull(e.split(/^U/))[0].trim());
+          });
+          const options = rq.answer.map((el) => {
+            return {
+              content: this.parseContent(el.text),
+              percent: Number.parseFloat(el['-fraction']),
+              isCorrect: el['-fraction'] !== '0'
+            };
+          });
+          let content = rq.questiontext.text;
+          if (rq.questiontext.file['#text']) {
+            const rex = /src="(.*?)"/g;
+            content = content.replace(rex, 'src="data:image/jpeg;base64,' + rq.questiontext.file['#text'] + '"');
+          }
+          let question = new QuestionMultipleChoice().deserialize({
+            content: this.parseContent(content),
+            options: options,
+            mark: Number.parseFloat(rq.defaultgrade),
+            type: 1,
+            chapters: parseChapter.map(el => {
+              if (Number.isInteger(el) === true) {
+                return el;
+              }
+            }),
+            level: 1,
+            learningOutcomes: []
+          });
+          question = this.changeType(question);
+          const isSuccess = await this.veryfiContentQuestion(question);
+          if (isSuccess) {
+            question.code = this.guidGenerator();
+            resultTemplate.success.push(question);
+            ++s;
+          } else {
+            question.code = this.guidGenerator();
+            resultTemplate.error.push(question);
+            ++w;
+          }
+        }
+      }
+    } catch (er) {
+      console.log(er);
+      alert('Không parse được file');
+      ++e;
+    }
+    return {
+      template: resultTemplate,
+      model: {
+        s: s,
+        w: w,
+        e: e
+      }
+    };
+  }
+
+  checkMultiChoice(answer, test) {
+    if (answer.indexOf('[~*MC*~]') === -1) {
+      return answer.trim() === test.trim();
+    } else {
+      const rex = /\[~\*MC\*~\]/g;
+      let isMatch = false;
+      this.removeEmptyNull(answer.split(rex)).forEach(el => {
+        if (el.trim() === test.trim()) {
+          isMatch = true;
+        }
+      });
+      return isMatch;
+    }
+  }
+
+  removeEmptyNull(array) {
+    return array.filter(e => {
+      if (e !== undefined && e !== '' && e) {
+        return e;
+      }
+    });
+  }
+
+  async veryfiContentQuestion(question) {
+    if (question.options && (question.chapters.indexOf(undefined) !== -1 || question.chapters.length === 0)) {
+      return false;
+    }
+    const url_rex = /<img [^>]*src="[^"]*"[^>]*>/gm;
+    let result = question.content.match(url_rex);
+    if (result) {
+      result = result.map(x => x.replace(/.*src="([^"]*)".*/, '$1'));
+      const i = 0;
+      const success = await this.recusiveChecking(result, i);
+      if (!success) {
+        return false;
+      }
+    }
+    if (question.options) {
+      const true_answer = question.options.filter(el => el.isCorrect === true);
+      if (!true_answer || true_answer.length === 0) {
+        return false;
+      }
+      let match = false;
+      const content = question.options.map(el => el.content.trim());
+      question.options.forEach(el => {
+        const data = content.filter(e => e === el.content.trim());
+        if (data.length > 1) {
+          match = true;
+          return;
+        }
+      });
+      if (match) {
+        return false;
+      }
+      question.options.forEach(async el => {
+        return await this.veryfiContentQuestion(el);
+      });
+    }
+    return true;
+  }
+
+  async recusiveChecking(result, i) {
+    const mime_rex = /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/;
+    if (!result[i]) {
+      return null;
+    }
+    if (result[i].match(mime_rex)) {
+      const minetype = result[i].match(mime_rex)[1];
+      if (!minetype || (minetype.indexOf('png') === -1 && minetype.indexOf('jpg') === -1
+        && minetype.indexOf('jpeg') === -1 && minetype.indexOf('gif') === -1)) {
+        return false;
+      }
+      return true;
+    } else {
+      try {
+        const success = await this.recusiveChecking(result, i + 1);
+        if (success === null) {
+          const a = await this.http.get(result[i]).toPromise().then(el => el).catch(el => el);
+          if (typeof a !== 'string') {
+            return false;
+          }
+          return true;
+        }
+      } catch (e) {
+        return false;
+      }
+    }
+  }
+
+  guidGenerator() {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+  }
+
+  descript(data) {
+    const keySize = 256;
+    const ivSize = 128;
+    const saltSize = 256;
+    const iterations = 1000;
+
+    const password = 'hieudeptrai';
+
+    const hexResult = this.base64ToHex(data);
+
+    const salt = CryptoJS.enc.Hex.parse(hexResult.substr(0, 64));
+    const iv = CryptoJS.enc.Hex.parse(hexResult.substr(64, 32));
+    const encrypted = this.hexToBase64(hexResult.substring(96));
+
+    const key = CryptoJS.PBKDF2(password, salt, {
+      keySize: keySize / 32,
+      iterations: iterations
+    });
+
+    const decrypted = CryptoJS.AES.decrypt(encrypted, key, {
+      iv: iv,
+      padding: CryptoJS.pad.Pkcs7,
+      mode: CryptoJS.mode.CBC
+    });
+    return decrypted.toString(CryptoJS.enc.Utf8);
+  }
+
+  hexToBase64(str) {
+    return btoa(String.fromCharCode.apply(null,
+      str.replace(/\r|\n/g, '').replace(/([\da-fA-F]{2}) ?/g, '0x$1 ').replace(/ +$/, '').split(' '))
+    );
+  }
+
+  base64ToHex(str) {
+    const hex = [];
+    for (let i = 0, bin = atob(str.replace(/[ \r\n]+$/, '')); i < bin.length; ++i) {
+      let tmp = bin.charCodeAt(i).toString(16);
+      if (tmp.length === 1) {
+        tmp = '0' + tmp;
+      }
+      hex[hex.length] = tmp;
+    }
+    return hex.join('');
+  }
+
+  parseExcelToJson(text) {
+    if (!text) {
+      return null;
+    }
+    try {
+      const data = XLSX.read(text, {
+        type: 'binary'
+      });
+      return this.toJson(data);
+    } catch (e) {
+      alert('Error');
+    }
+    return null;
+  }
+
+  toJson(workbook) {
+    const result = [];
+    workbook.SheetNames.forEach(function (sheetName) {
+      const roa = (XLSX.utils as any).sheet_to_row_object_array(workbook.Sheets[sheetName]);
+      if (roa.length > 0) {
+        result.push(roa);
+      }
+    });
+    return result;
+  }
+
+  parseContent(text) {
+    const p_rex = /<p*>(.*?)<\/p>/gm;
+    const b_rex = /<b*>(.*?)<\/b>/gm;
+    const a_rex = /<a*>(.*?)<\/a>/gm;
+    const img_rex = /<img[^>]*>(.*?)<\/img>/g;
+    let result = '';
+    if (text.match(p_rex)) {
+      const list = text.match(p_rex);
+      for (let i = 0; i < list.length; i++) {
+        const rex = /<p*>(.*?)<\/p>/gm;
+        const a = rex.exec(list[i]);
+        if (a) {
+          const final = this.replaceEntity(a[1]);
+          result += final.isXML ? final.text : '<p>' + final.text + '</p>';
+        } else {
+          result += list[i];
+        }
+      }
+    }
+    if (text.match(a_rex)) {
+      const list = text.match(a_rex);
+      for (let i = 0; i < list.length; i++) {
+        const rex = /<a*>(.*?)<\/a>/gm;
+        const a = rex.exec(list[i]);
+        if (a) {
+          const final = this.replaceEntity(a[1]);
+          result += final.isXML ? final.text : '<a>' + final.text + '</a>';
+        } else {
+          result += list[i];
+        }
+      }
+    }
+    if (text.match(b_rex)) {
+      const list = text.match(b_rex);
+      for (let i = 0; i < list.length; i++) {
+        const rex = /<b*>(.*?)<\/b>/gm;
+        const a = rex.exec(list[i]);
+        if (a) {
+          const final = this.replaceEntity(a[1]);
+          result += final.isXML ? final.text : '<b>' + final.text + '</b>';
+        } else {
+          result += list[i];
+        }
+      }
+    }
+    return result;
+  }
+
+  replaceEntity(text) {
+    let isXML = false;
+    if (text.match(/</g) || text.match(/>/g) || text.match(/&/g)) {
+      isXML = true;
+      text = text.replace(/</g, '&lt;');
+      text = text.replace(/>/g, '&gt;');
+      text = text.replace(/&(?![a-z#]+;)/g, '&amp;');
+    }
+    console.log(text);
+    return {
+      isXML: isXML,
+      text: text
+    };
+  }
+
+}

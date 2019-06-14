@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/bootstrap.css">
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/jquery.signalR-2.3.0.min.js"></script>
+    <script src="js/signalr.imple.js"></script>
+</head>
+<body>
+
+<div class="blur-bg">
+    <div class="overlay">
+    </div>
+</div>
+<div class="login-form">
+    <p class="login-title">LOGIN</p>
+    <div class="form-content">
+        <form action="waiting.html">
+    <div class="form-group">
+                <!--<label for="exampleInputEmail1">Email address</label>-->
+                <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <!--<label for="exampleInputPassword1">Password</label>-->
+                <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+            </div>
+            <button type="submit" class="btn">Submit</button>
+        </form>
+    </div>
+</div>
+<script>
+    // function Check_Version(){
+    //     var rv = -1; // Return value assumes failure.
+    //
+    //     if (navigator.appName == 'Microsoft Internet Explorer'){
+    //
+    //         var ua = navigator.userAgent,
+    //             re  = new RegExp("MSIE ([0-9]{1,}[\\.0-9]{0,})");
+    //
+    //         if (re.exec(ua) !== null){
+    //             rv = parseFloat( RegExp.$1 );
+    //         }
+    //     }
+    //     else if(navigator.appName == "Netscape"){
+    //         /// in IE 11 the navigator.appVersion says 'trident'
+    //         /// in Edge the navigator.appVersion does not say trident
+    //         if(navigator.appVersion.indexOf('Trident') === -1) rv = 12;
+    //         else rv = 11;
+    //     }
+    //
+    //     return rv;
+    // }
+    // alert();
+</script>
+<script src="js/main.js"></script>
+</body>
+</html>

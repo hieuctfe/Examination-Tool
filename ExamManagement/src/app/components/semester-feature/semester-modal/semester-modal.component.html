@@ -1,0 +1,43 @@
+<div class="p-4">
+  <h5>{{type.toLocaleUpperCase()}}</h5>
+  <form [formGroup]="form" (ngSubmit)="submit(form)">
+    <div class="form-group">
+      <label for="code">Code</label>
+      <input id="code"
+             [readonly]="type === 'edit'"
+             class="form-control"
+             formControlName="code">
+      <div *ngIf="submitted && form.controls['code'].errors?.required" class="d-block invalid-feedback">
+        Code cannot be empty
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="startDate">Start Date</label>
+      <input id="startDate"
+             class="form-control"
+             formControlName="startDate"
+             [owlDateTimeTrigger]="dateStart" [owlDateTime]="dateStart">
+      <owl-date-time [pickerType]="'calendar'" #dateStart></owl-date-time>
+      <div *ngIf="submitted && form.controls['startDate'].errors?.required" class="d-block invalid-feedback">
+        Time cannot be empty
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="endDate">End Date</label>
+      <input id="endDate"
+             class="form-control"
+             formControlName="endDate"
+             [min]="form.controls['startDate'].value"
+             [owlDateTimeTrigger]="endTime" [owlDateTime]="endTime">
+      <owl-date-time [pickerType]="'calendar'" #endTime></owl-date-time>
+      <div *ngIf="submitted && form.controls['endDate'].errors?.required" class="d-block invalid-feedback">
+        Time cannot be empty
+      </div>
+    </div>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info mr-2">{{type === 'create' ? 'Create': 'Edit'}}</button>
+      <button type="button" class="btn" (click)="modalRef.hide()">Cancel</button>
+    </div>
+  </form>
+</div>
+

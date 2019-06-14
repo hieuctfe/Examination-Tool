@@ -1,0 +1,11 @@
+<div style="flex: 1" class="position-relative">
+  <main style="max-height: calc(100vh - 104.31px); min-height: calc(100vh - 104.31px); overflow-y: auto">
+    <div class="p-4">
+      <router-outlet></router-outlet>
+    </div>
+    <!-- <Mex-footer class="position-fixed" style="bottom: 0; right: 0;left:265px"></Mex-footer> -->
+  </main>
+  <ul class="sidenav sidenav-fixed position-absolute">
+    <Mex-side-bar></Mex-side-bar>
+  </ul>
+</div>

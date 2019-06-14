@@ -1,0 +1,125 @@
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {UserService} from '../../services/user.service';
+
+@Component({
+  selector: 'Mex-side-bar',
+  templateUrl: './side-bar.component.html',
+  styleUrls: ['./side-bar.component.scss']
+})
+export class SideBarComponent implements OnInit {
+  listMenu = [
+    {
+      content: 'Semester',
+      role: ['Examinator'],
+      child: [
+        {
+          content: 'Manage Semester',
+          url: 'Semester/Management',
+          child: null,
+        },
+        {
+          content: 'Manage Exam',
+          url: 'Semester/ExamCode',
+          child: null
+        },
+      ]
+    },
+    {
+      content: 'Course',
+      url: 'Course',
+      role: ['Lecturer', 'Leader', 'Examinator'],
+      child: null
+    },
+    {
+      content: 'Test Exam',
+      role: ['Lecturer', 'Examinator', 'Manager', 'Leader'],
+      child: [
+        {
+          content: 'Create Test Exam',
+          url: 'Exam/Create',
+          child: null,
+          role: ['Examinator'],
+        },
+        {
+          content: 'Manage Test Exam',
+          url: 'Exam/Update',
+          child: null,
+          role: ['Examinator'],
+        },
+        {
+          content: 'Approve Test Exam',
+          url: 'Exam/Review',
+          child: null,
+          role: ['Lecturer', 'Manager', 'Leader'],
+        },
+      ]
+    },
+    {
+      content: 'Password',
+      url: 'Password',
+      role: ['Manager'],
+      child: null
+    },
+    {
+      content: 'Review Student Result',
+      url: 'Review',
+      child: null,
+      role: ['Examinator'],
+    },
+    {
+      content: 'Process',
+      url: 'Process',
+      role: ['IT'],
+      child: null
+    },
+
+  ];
+  expandList = [];
+  user: any;
+
+  constructor(public route: Router, private userSV: UserService) {
+  }
+
+  ngOnInit() {
+    this.userSV.getUser.subscribe(el => {
+      this.user = el;
+    });
+  }
+
+  gotoView(data) {
+    if (data.url) {
+      this.route.navigate(['View/' + data.url]);
+    }
+  }
+
+  setCourse(source) {
+    if (!source.item.dataItem.child) {
+      this.gotoView(source.item.dataItem);
+    } else {
+      if (this.expandList.indexOf(source.item.index) !== -1) {
+        const index = this.expandList.indexOf(source.item.index);
+        this.expandList.splice(index, 1);
+      } else {
+        this.expandList.push(source.item.index);
+      }
+    }
+  }
+
+  checkRole(menu) {
+    if (menu.role && menu.role.length > 0) {
+      if (this.user) {
+        let isAccess = false;
+        this.user.roles.forEach(el => {
+          if (menu.role.indexOf(el) !== -1) {
+            isAccess = true;
+          }
+        });
+        return isAccess;
+      }
+      return true;
+    }
+    return true;
+  }
+
+}

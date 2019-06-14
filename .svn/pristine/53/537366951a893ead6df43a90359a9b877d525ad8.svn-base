@@ -1,0 +1,31 @@
+<div id="header" class="header-main  pt-4 pb-4">
+  <div class="d-flex">
+    <div class="d-inline-block text-center" style="width: 265px; flex: 0 0 auto">
+      <div class="header-logo">
+        <a class="logo" routerLink="Index">
+          <img src="assets/image/logo_fug.jpg" style="width: calc(100% - 3rem)"
+               height="67" alt="Eguru">
+        </a>
+      </div>
+    </div>
+    <div class="section-right pl-4 pr-4 text-right" style="flex: 1 1 0%">
+      <div class="mr-auto text-center">
+        <h3 class="mb-0" style="color: white">Exam Management</h3>
+      </div>
+      <div *ngIf="user" class="btn-group" dropdown>
+        <button id="menu" dropdownToggle type="button" class="dropdown-toggle"
+                aria-controls="dropdown">
+          <i class="ion ion-md-contact pr-1" style="font-size: 20px"></i>
+          {{user.fullname}}
+          <span class="caret"></span>
+        </button>
+        <ul id="dropdown" *dropdownMenu class="dropdown-menu"
+            role="menu" aria-labelledby="button-basic">
+          <li role="menuitem"><a class="dropdown-item" href="#"><i class="ion ion-md-log-out"></i> Logout</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+

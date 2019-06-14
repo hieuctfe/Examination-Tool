@@ -1,0 +1,44 @@
+if (document.layers) {
+    //Capture the MouseDown event.
+    document.captureEvents(Event.MOUSEDOWN);
+
+    //Disable the OnMouseDown event handler.
+    document.onmousedown = function () {
+        return false;
+    };
+}
+else {
+    //Disable the OnMouseUp event handler.
+    document.onmouseup = function (e) {
+        if (e != null && e.type == "mouseup") {
+            //Check the Mouse Button which is clicked.
+            if (e.which == 2 || e.which == 3) {
+                //If the Button is middle or right then disable.
+                return false;
+            }
+        }
+    };
+}
+
+//Disable the Context Menu event.
+document.oncontextmenu = function () {
+    return false;
+};
+//// selection detect
+function disableSelect(event) {
+    event.preventDefault();
+}
+
+function startDrag(event) {
+    window.addEventListener('mouseup', onDragEnd);
+    window.addEventListener('selectstart', disableSelect);
+    // ... my other code
+}
+
+function onDragEnd() {
+    window.removeEventListener('mouseup', onDragEnd);
+    window.removeEventListener('selectstart', disableSelect);
+    // ... my other code
+}
+
+window.addEventListener('selectstart', function(e){ e.preventDefault(); });

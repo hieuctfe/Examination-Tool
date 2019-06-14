@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,MAAO;EACL,SAAS,EAAE,OAAO;;AAGpB,MAAO;EACL,KAAK,EAAE,IAAI;EACX,OAAO,EAAE,MAAM;;AAGjB,cAAe;EACb,MAAM,EAAE,KAAK;EACb,UAAU,EAAE,MAAM",
+"sources": ["setting-lo.component.scss"],
+"names": [],
+"file": "setting-lo.component.css"
+}

@@ -1,0 +1,119 @@
+import {AfterViewChecked, ChangeDetectorRef, Component, ViewChild} from '@angular/core';
+import {WizardComponent} from 'ng2-archwizard/dist';
+import {Exam} from '../../../model/exam.model';
+import {ExamService} from '../../../services/exam.service';
+import {Question} from '../../../model/question.model';
+import {Course} from '../../../model/course.model';
+import {SettingCourse} from '../../../model/setting-course.model';
+import {ChapterService} from '../../../services/chapter.service';
+import {LoService} from '../../../services/lo.service';
+import {combineLatest} from 'rxjs';
+import {FormGroup} from '@angular/forms';
+import {SettingExamComponent} from '../setting-exam/setting-exam.component';
+
+@Component({
+  selector: 'Mex-create-exam',
+  templateUrl: './create-exam.component.html',
+  styleUrls: ['./create-exam.component.scss']
+})
+export class CreateExamComponent implements AfterViewChecked {
+  @ViewChild('wizard') wizard: WizardComponent;
+  @ViewChild('setting') setting: SettingExamComponent;
+  exam: Exam = new Exam();
+  settingForm: FormGroup;
+  finalData: any;
+  listLO = [];
+  listChapter = [];
+
+  constructor(private examSV: ExamService, private chapterSV: ChapterService, private loSV: LoService,
+              private cdRef: ChangeDetectorRef) {
+  }
+
+  ngAfterViewChecked() {
+    this.cdRef.detectChanges();
+  }
+
+  nextStep(data) {
+    switch (data.step) {
+      case 1: {
+        this.wizard.navigation.goToNextStep();
+        break;
+      }
+      case 2: {
+        if (this.exam.course) {
+          this.setting.changeSub(true);
+          if (this.settingForm.valid) {
+            this.exam.settingCourse = this.settingForm.value;
+            const result = combineLatest(this.chapterSV.getChapterBaseOnCourse(this.exam.course[0]),
+              this.loSV.getLoBaseOnCourseList(this.exam.course[0]));
+            result.subscribe((rs: any) => {
+              this.wizard.navigation.goToNextStep();
+              this.listChapter = rs[0];
+              this.listLO = rs[1];
+            });
+          }
+        }
+        break;
+      }
+      case 3: {
+        if (data.type === 'random') {
+          this.finalData = data.finalData;
+          this.wizard.navigation.goToStep(4);
+        } else {
+          this.wizard.navigation.goToNextStep();
+        }
+        break;
+      }
+      case 4: {
+        this.finalData = data.finalData;
+        this.wizard.navigation.goToNextStep();
+        break;
+      }
+      case 5: {
+        this.wizard.navigation.goToNextStep();
+        break;
+      }
+      default: {
+        break;
+      }
+    }
+  }
+
+  reset() {
+    this.wizard.navigation.reset();
+    this.finalData = null;
+    this.exam = new Exam().deserialize({
+      course: new Course(),
+      settingCourse: new SettingCourse(),
+      listLOC: new Array<any>(),
+      listQuestion: new Array<Question>(),
+      typeExam: null,
+    });
+  }
+
+  setForm(form) {
+    this.settingForm = form;
+  }
+
+  generateTest() {
+    const hour = Math.floor(this.exam.settingCourse.duration / 60);
+    const minute = (this.exam.settingCourse.duration % 60);
+    const data = {
+      questions: this.exam.listQuestion.map((el: any) => el.code),
+      courseCode: this.exam.course[0],
+      duration: (hour >= 10 ? hour : '0' + hour)
+      + ':' + (minute >= 10 ? minute : '0' + minute) + ':00',
+    };
+
+    this.examSV.generateTestManufacturer(data).subscribe(el => {
+      this.nextStep({
+        step: 4, finalData: {
+          numberOfTest: this.exam.settingCourse.numberOfTest,
+          numberOfQuestion: this.exam.settingCourse.numberOfQuesion,
+          courseCode: data.courseCode,
+          duration: data.duration
+        }
+      });
+    });
+  }
+}

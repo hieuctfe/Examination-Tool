@@ -1,0 +1,26 @@
+﻿@model WaitingVM
+
+@{
+    ViewBag.SubjectCode = Model.Course;
+    ViewBag.StudentCode = Model.StudentCode;
+    ViewBag.StudentName = Model.StudentName;
+    var duration = (Model.StartTime - DateTimeOffset.Now);
+}
+@section Scripts
+{
+    <script type="text/javascript">
+        var timeOutHandle = function () {
+            document.getElementById("timer").innerHTML = "Starting";
+            document.location.pathname = '@Url.Action("Take", new { id = Model.TestId })';
+        };
+        timer(@duration.TotalSeconds).then(timeOutHandle);
+    </script>
+}
+<div class="body-exam row">
+    <div class="waiting-exam">
+        <p class="title-exam">EXAM INFOMATION</p>
+        <p>This quiz start on @Model.StartTime.ToString("F")</p>
+        <p>This quiz closed on @Model.EndTime.ToString("F")</p>
+        <p>Time limit: @Model.Duration.TotalMinutes minutes</p>
+    </div>
+</div>

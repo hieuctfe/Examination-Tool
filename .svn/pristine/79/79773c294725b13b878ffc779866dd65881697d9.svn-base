@@ -1,0 +1,276 @@
+
+
+
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12, .col, .col-auto, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm, .col-sm-auto, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md, .col-md-auto, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg, .col-lg-auto, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl, .col-xl-auto {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+$quest-background: rgba(211, 211, 211, 0.4);
+$flag-background: #313745;
+$num-backgrond: $quest-background;
+
+.logo img {
+  width: 100%;
+  position: absolute;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+}
+
+.logo {
+  position: relative;
+  height: 100%;
+  //float: left;
+  @extend %none-margin;
+  @extend %none-padding;
+}
+
+%none-margin {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+
+%none-padding {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.student-info {
+  @extend %none-margin;
+  @extend %none-padding;
+  position: relative;
+  height: 100%;
+  ul {
+    list-style-type: none;
+    padding-left: 20px !important;
+    position: relative !important;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+    li {
+      line-height: 3.5vh;
+      font-size: 1.2rem;
+      letter-spacing: 1.5px;
+    }
+  }
+  .exam-timing {
+    vertical-align: middle;
+    clear: both;
+  }
+}
+
+header {
+  height: 15vh;
+  position: relative;
+  border: solid 1px black;
+}
+
+.contain-all {
+  margin-left: 0px;
+  margin-right: 0px;
+  header {
+    @extend %none-margin;
+  }
+}
+
+.exam-timing {
+  ul {
+    li {
+      display: inline-block;
+      font-size: 2rem;
+    }
+    text-align: center;
+    margin-right: 30px;
+    font-weight: bolder;
+  }
+}
+
+.body-exam {
+  //padding-left: 30px;
+  position: relative;
+  height: 85vh;
+  @extend %none-margin;
+  .question-num {
+    text-align: center;
+    .submit-exam {
+      width: 90%;
+      margin: auto;
+      background: #F26F21;
+      color: white;
+    }
+    padding: 10px;
+    padding-top: 0px;
+    ul {
+      @extend %none-margin;
+      border: solid 0.5px black;
+      margin-bottom: 12px;
+      border-left: unset;
+      border-radius: 4px;
+      list-style-type: none;
+      li {
+        vertical-align: middle;
+        padding: 5px;
+        //height: 50px;
+        text-align: center;
+        p {
+          margin: auto;
+          width: 30px;
+          height: 30px;
+          line-height: 30px;
+          background: $num-backgrond;
+          border: solid 0.5px black;
+          color: black;
+        }
+        p.active {
+          border: solid 3px #0066B2;
+          line-height: 26px;
+        }
+        p.checked {
+          background: $flag-background;
+          color: white;
+        }
+        a.flaged:before {
+          content: '';
+          background: url("../../exam-feature/review-exam/detail/img/bookmark.png");
+          background-repeat: no-repeat;
+          background-size: 100% auto;
+          position: absolute;
+          width: 20px;
+          height: 30px;
+          right: 2px;
+          top: 3px;
+          //top:50%;
+          //-webkit-transform: trn;
+          //-moz-transform: trn;
+          //-ms-transform: trn;
+          //-o-transform: trn;
+          //transform: trn;
+        }
+      }
+    }
+  }
+  .question-info {
+    height: 85vh;
+    overflow-y: scroll;
+    .quest {
+      //visibility: hidden;
+      //display: none;
+      //border: 0.5px solid lightgray;
+      //border-radius: 5px;
+    }
+    .showQuestion {
+      //visibility: visible;
+      display: flex;
+    }
+    div {
+      @extend %none-margin;
+      padding: 10px !important;
+      .num-flag {
+        @extend %none-margin;
+        padding-top: 0px !important;
+        padding-left: 0px !important;
+        p {
+          background: $flag-background;
+          text-align: center;
+          color: white;
+          height: 100px;
+          b:nth-child(1) {
+            //font-size: 13px;
+            display: block;
+          }
+          b:nth-child(2) {
+            margin-top: 40px;
+            font-size: 13px;
+          }
+          span {
+            display: block;
+            font-size: 13px;
+            width: 40px;
+            height: 40px;
+            margin: auto;
+            margin-top: 20px;
+            //background: url("img/flag00.png");
+            background-repeat: no-repeat;
+            -webkit-background-size: 100% auto;
+            background-size: 100% auto;
+            //&.active {
+            //  background: url("img/flag11.png");
+            //  background-size: 100% auto;
+            //}
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
+      }
+      .text-question {
+        @extend %none-margin;
+        background: $quest-background;
+        .card-body {
+          padding: 0px !important;
+          img {
+            max-width: 90% !important;
+          }
+          .list-aw {
+            list-style-type: none;
+            margin-top: 20px;
+            li {
+              padding-left: 5px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.waiting-exam {
+  width: 500px;
+  height: 350px;
+  padding: 30px;
+  //height: fit-content;
+  background: $quest-background;
+  position: relative;
+  top: 30%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  .title-exam {
+    font-weight: bolder;
+    text-align: center;
+  }
+  p {
+    text-align: center;
+  }
+}
+
+.paging-nav {
+  display: inline-block;
+  position: relative;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -moz-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  -o-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+
+.correct-aw {
+  background-color: rgba(75, 168, 156, .7);
+}
+
+.inCorrect-aw {
+  background-color: rgba(246, 43, 102, .7);
+}
+

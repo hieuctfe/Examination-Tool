@@ -1,0 +1,9 @@
+<form (submit)="submit()">
+  <div class="form-inline">
+    <input type="text" class="form-control" formControlName="password">
+    <button class="btn btn-info mr-2">Change Password</button>
+    <div class="d-block w-100 invalid-feedback">
+      Password must contain between 6 and 20 characters.
+    </div>
+  </div>
+</form>

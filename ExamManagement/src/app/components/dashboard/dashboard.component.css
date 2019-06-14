@@ -1,0 +1,42 @@
+ul.sidenav.sidenav-fixed {
+  overflow-y: scroll;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border-right: 1px solid rgba(0, 0, 0, 0.14); }
+
+.sidenav.sidenav-fixed {
+  left: 0;
+  -webkit-transform: translateX(0);
+  transform: translateX(0);
+  position: fixed; }
+
+ul:not(.browser-default) {
+  padding-left: 0;
+  list-style-type: none; }
+
+.sidenav {
+  position: fixed;
+  width: 265px;
+  left: 0;
+  top: 0;
+  margin: 0;
+  -webkit-transform: translateX(-100%);
+  transform: translateX(-100%);
+  height: 100%;
+  height: -moz-calc(100%);
+  background-color: #fff;
+  z-index: 999;
+  overflow-y: auto;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateX(-105%);
+  transform: translateX(-105%); }
+
+main {
+  padding-left: 265px; }
+
+main {
+  display: block; }
+
+/*# sourceMappingURL=dashboard.component.css.map */

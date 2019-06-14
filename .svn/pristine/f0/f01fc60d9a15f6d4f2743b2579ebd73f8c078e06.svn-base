@@ -1,0 +1,92 @@
+import {Observable} from 'rxjs';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {GlobalVariable} from '../global';
+import {HttpResponse} from '../../../node_modules/@types/selenium-webdriver/http';
+import {tap} from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class QuestionService {
+
+  constructor(private http: HttpClient) {
+  }
+
+  importMultipleChoice(data) {
+    return this.http.post(GlobalVariable.BASE_API + 'Question/ImportMultiChoices', data);
+  }
+
+  findIndex(array, data) {
+    console.log(data);
+    console.log(array);
+    console.log(array.map(el => el.code).indexOf(data.code));
+    return array.map(el => el.code).indexOf(data.code);
+  }
+
+  createLocal(array, data) {
+    array.push(data);
+    return array;
+  }
+
+  updateLocal(array, index, data) {
+    if (index !== -1) {
+      array[index] = data;
+    }
+    return array;
+  }
+
+  deleteLocal(array, index) {
+    if (index !== -1) {
+      array.splice(index, 1);
+    }
+  }
+
+  getAll(course, data, type): Observable<HttpResponse> {
+    if (!data) {
+      return this.http.get<HttpResponse>(GlobalVariable.BASE_API + 'Question/GetAll?courseCode=' + course, {observe: 'response'});
+    }
+    data.searchValue = data.searchValue ? data.searchValue : '';
+    return this.http.get<HttpResponse>(GlobalVariable.BASE_API + 'Question/GetAll?courseCode=' + course + '&searchValue='
+      + data.searchValue + '&pageIndex=' + data.currentPage + '&pageSize=' + data.itemsPerPage + '&sortField='
+      + data.sortField + '_' + type, {observe: 'response'});
+  }
+
+  getQuestion(code) {
+    return this.http.get(GlobalVariable.BASE_API + 'Question/Get?code=' + code);
+  }
+
+  deleteQuestion(code) {
+    return this.http.delete(GlobalVariable.BASE_API + 'Question/Delete?code=' + code);
+  }
+
+  updateQuestion(data) {
+    return this.http.put(GlobalVariable.BASE_API + 'Question', data);
+  }
+
+  getImportStatus() {
+    return this.http.get(GlobalVariable.BASE_API + 'Question/GetImportStatus?isLoad=false');
+  }
+
+  getQuestionByChapter(id, config) {
+    return this.http.get(GlobalVariable.BASE_API + 'Question/GetQuestionByChapter?chaptersId=' + id
+      + '&level=' + (config.level ? config.level : null)
+      + '&pageIndex=' + (config.pageIndex ? config.pageIndex : null)
+      + '&pageSize=' + (config.pageSize ? config.pageSize : null), {observe: 'response'});
+  }
+
+  getQuestionByLearningOutcome(id, config) {
+    return this.http.get(GlobalVariable.BASE_API + 'Question/GetQuestionByLearningOutcome?learningOutcome=' + id
+      + '&level=' + (config.level ? config.level : null)
+      + '&pageIndex=' + (config.pageIndex ? config.pageIndex : null)
+      + '&pageSize=' + (config.pageSize ? config.pageSize : null), {observe: 'response'});
+  }
+
+  verifyImport(data) {
+    return this.http.post(GlobalVariable.BASE_API + 'Question/ImportVerified', data);
+  }
+
+  verify(id) {
+    return this.http.post(GlobalVariable.BASE_API + 'Question/Verified?id=' + id, null);
+  }
+}

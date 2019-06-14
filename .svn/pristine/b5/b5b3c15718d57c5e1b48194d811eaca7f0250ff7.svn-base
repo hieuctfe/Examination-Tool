@@ -1,0 +1,85 @@
+import { Component, OnInit } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { LoService } from '../../../../services/lo.service';
+import { Observable } from 'rxjs';
+import { LearningOutcome } from '../../../../model/LO.model';
+import { ActivatedRoute } from '@angular/router';
+import { MessageService } from '../../../../services/message.service';
+import { LoModalComponent } from '../lo-modal/lo-modal.component';
+import { ITreeOptions } from 'angular-tree-component';
+
+@Component({
+  selector: 'Mex-manage',
+  templateUrl: './manage.component.html',
+  styleUrls: ['./manage.component.scss']
+})
+export class ManageComponent implements OnInit {
+  code: any;
+  rootData: any;
+  tree: any;
+  options: ITreeOptions = {
+    allowDrag: (node) => {
+      if (node.data.haveChildren) {
+        return false;
+      }
+      return true;
+    },
+    allowDrop: (node) => {
+      return true;
+    },
+
+  };
+
+  constructor(private loSV: LoService, private route: ActivatedRoute, private messageSV: MessageService) {
+  }
+
+  ngOnInit() {
+    this.route.parent.parent.params.subscribe(params => {
+      this.code = params['course'];
+      if (this.code) {
+        this.loadMO(this.code);
+      }
+    });
+  }
+
+  loadMO(code) {
+    this.loSV.getLoBaseOnCourse(this.code).subscribe((el: any) => {
+      this.rootData = Object.assign({}, el);
+      this.tree = el.children;
+      console.log(this.rootData);
+    }, er => console.log(er));
+  }
+
+  addNew(type, data) {
+    const config = {
+      initialState: {
+        data: data ? data : {},
+        type: 'create',
+        returnDt: new LearningOutcome()
+      }
+    };
+    this.messageSV.createModal(data, LoModalComponent, config).subscribe(async (value: any) => {
+      if (type === 'MO') {
+
+      } else {
+      }
+    });
+  }
+
+  edit(type, data) {
+    const config = {
+      initialState: {
+        data: data,
+        type: 'edit',
+        returnDt: {}
+      }
+    };
+    this.messageSV.createModal(data, LoModalComponent, config).subscribe(async (value: any) => {
+      if (type === 'MO') {
+
+      } else {
+      }
+    });
+  }
+
+}

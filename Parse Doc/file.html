@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <select id="typeQuesiton">
+        <option value="1">Multiple choice</option>
+        <option selected value="2">Reading</option>
+        <option value="3">Matching</option>
+        <option value="4">Indicate Mistake</option>
+        <option value="5">Fill Bank</option>
+    </select>
+    <input type="file" id="file" accept="application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+<div id="test" style="margin-top: 30px"></div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    crossorigin="anonymous"></script>
+<script src="docxgen-master/docxgen.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.7.7/xlsx.core.min.js"></script>
+<script src="FileSaver.js-master/src/FileSaver.js"></script>
+<script src="docxgen-master/jszip-utils.js"></script>
+<script>
+    (function () {
+        'use strict';
+
+        var wordType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+        var excelType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        var $type = $('#typeQuesiton');
+
+        $('#file').on('change', function (event) {
+
+            var reader = new FileReader();
+
+            var file = event.target.files[0];
+            if (file) {
+
+                reader.onload = function (e) {
+                    var data = e.target.result;
+                    var result;
+
+                    //WORD
+
+                    if (file.type === wordType) {
+                        loadFile(URL.createObjectURL(file), function (err, content) {
+                            try {
+                            var doc = new Docxgen(content);
+                            var text = doc.getFullText();
+                            var type = $type.val();
+                            handleDocx(type, text);
+                            } catch {
+                                alert('File khong hop le');
+                            }
+
+                        });
+                    }
+
+                    //EXCEL
+
+                    if (file.type === excelType) {
+                        var workbook = XLSX.read(data, { type: 'binary' });
+                        var sheet_name_list = workbook.SheetNames;
+                        sheet_name_list.forEach(function (y) {
+                            var roa = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+                            if (roa.length > 0) {
+                                result = roa;
+                            }
+                        });
+                        console.log(result);
+                    }
+
+                }
+
+                reader.readAsArrayBuffer(file);
+            };
+
+
+
+        })
+
+        var loadFile = function (url, callback) {
+            JSZipUtils.getBinaryContent(url, callback);
+        }
+
+        var handleDocx = function (t, te) {
+            let doc = document.getElementById("test");
+            var question_rex = /qn=\d*/mgi;
+            var array = [];
+
+            if (t == 2) {
+                question_rex = /pn=\d*/mgi;
+            }
+
+            array = te.split(question_rex);
+
+            switch (t) {
+                case '1':
+                    //Mutiple choice
+                    array = array.filter(el => el);
+                    array.map(el => {
+                        var answer_rex = /ans=\w/mgi;
+                        var answers = el.split(answer_rex).filter(el => el);
+                        var question = answers[0];
+                        var flag = answers[answers.length - 1].split('ANSWER:');
+                        flag = flag[1].split('MARK:');
+                        var true_answer = flag[0];
+                        flag = flag[1].split('UNIT:');
+                        var mark = flag[0];
+                        flag = flag[1].split('MIX CHOICES:');
+                        var unit = flag[0];
+                        var mix =  !!!flag[1].toLowerCase == 'yes';
+
+                        answers.splice(0, 1);
+                        answers.splice(answers.length - 1, 1);
+
+                        console.log({
+                            question: question,
+                            answers: answers,
+                            true_answer: true_answer,
+                            mark: mark,
+                            unit: unit,
+                            mix: mix
+                        })
+                    })
+                    break;
+                case '2':
+                    // Reading
+                    array = array.filter(el => el);
+                    array.map(el => {
+                        var text = el.split(/qn=\d*/mgi);
+                        var passage = text[0];
+                        text.splice(0, 1);
+                        var data = text.map(l => {
+                            var answer_rex = /ans=\w/mgi;
+                            var answers = l.split(answer_rex).filter(el => el);
+                            var question = answers[0];
+                            var flag = answers[answers.length - 1].split('ANSWER:');
+                            flag = flag[1].split('MARK:');
+                            var true_answer = flag[0];
+                            flag = flag[1].split('MIX CHOICES:');
+                            var mark = flag[0];
+                            var mix = !!!flag[1].toLowerCase() == 'yes';
+
+                            answers.splice(0, 1);
+                            answers.splice(answers.length - 1, 1);
+
+                             return {
+                                question: question,
+                                answers: answers,
+                                true_answer: true_answer,
+                                mark: mark,
+                                mix: mix
+                            }
+                        });
+
+                        console.log({
+                            passage: passage,
+                            questions: data
+                        });
+                        // doc.insertAdjacentHTML('beforeend',"<p>"+JSON.stringify({
+                        //     passage: passage,
+                        //     questions: data
+                        // })+"<p>");
+
+                    })
+                    break;
+                case '3':
+                    // Matching
+                    doc.innerHTML = "";
+                    for (let i = 1; i<array.length; i++)  {
+                        let el = array[i];
+                        let question = el.split(/\[CASE\]|MARK:/);
+                        // console.log(question[0]);
+                        doc.insertAdjacentHTML('beforeend',"<p>"+question[0]+"<p>");
+                        for (let j = 1; j<question.length-1; j++)  {
+                            let temp = question[j].trim().split(/\[[\S]\] /);
+                            // console.log(temp[1] + " - " + temp[2]);
+                            doc.insertAdjacentHTML('beforeend',"<p>"+temp[1] + " - " + temp[2]+"<p>");
+                        }
+                        // console.log("mark is: " + question[question.length-1].trim());
+                        doc.insertAdjacentHTML('beforeend',"<p>"+"MARK: " + question[question.length-1].trim()+"<p>");
+                        doc.insertAdjacentHTML('beforeend',"<p>---------------------<p>");
+
+                    }
+                    break;
+                case '4':
+                    // INDICATE
+                    doc.innerHTML = "";
+                    for (let i = 1; i<array.length; i++)  {
+                        let el = array[i];
+                        let question = el.split("ANSWER:");
+                        // console.log(question[0]);
+                        doc.insertAdjacentHTML('beforeend',"<p>"+question[0]+"<p>");
+                        let anwser = question[1].split("MARK:");
+                        doc.insertAdjacentHTML('beforeend',"<p>"+anwser[0]+"<p>");
+                        // console.log(anwser[0]);
+                        let mark = anwser[1].split("UNIT");
+                        // console.log(mark[0]);
+                        doc.insertAdjacentHTML('beforeend',"<p>"+mark[0]+"<p>");
+                        doc.insertAdjacentHTML('beforeend',"<p>---------------------<p>");
+                    }
+                    break;
+                case '5':
+                    // Fill Bank<
+                    break;
+                default:
+                    alert('Error');
+            }
+        }
+    })();
+
+</script>
+
+</html>

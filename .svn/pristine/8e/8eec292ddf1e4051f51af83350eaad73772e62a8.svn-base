@@ -1,0 +1,21 @@
+<ng-container *ngFor="let mn of listMenu">
+  <li *ngIf="checkRole(mn)"
+      [ngClass]="{'has-sub':mn.child, 'last': !mn.child}">
+    <a class="position-relative" [routerLink]="mn.child ? null : mn.url"
+       (click)="mn.isOpen ? mn.isOpen = false : mn.isOpen = true">
+      <i *ngIf="mn.child" [ngClass]="mn.isOpen ? 'ion-md-arrow-dropdown' : 'ion-md-arrow-dropright'"
+         class="position-absolute menu-icon ion"></i>
+      <span>{{mn.content}}</span>
+    </a>
+    <ul *ngIf="mn.child" [collapse]="!mn.isOpen">
+      <ng-container *ngFor="let n of mn.child">
+        <li *ngIf="checkRole(n)" class='last pl-4'>
+          <a [routerLink]="n.url">
+            <span>{{n.content}}</span>
+          </a>
+        </li>
+      </ng-container>
+    </ul>
+  </li>
+</ng-container>
+

@@ -1,0 +1,122 @@
+import {Component, OnInit} from '@angular/core';
+import {ExamService} from '../../../services/exam.service';
+import {combineLatest} from 'rxjs';
+import {CourseService} from '../../../services/course.service';
+import {MessageService} from '../../../services/message.service';
+import {UpdateModalComponent} from '../update-modal/update-modal.component';
+
+@Component({
+  selector: 'Mex-update-exam',
+  templateUrl: './update-exam.component.html',
+  styleUrls: ['./update-exam.component.scss']
+})
+export class UpdateExamComponent implements OnInit {
+  courses = ['All'];
+  type = 'set';
+  sizes = [
+    10, 25, 50
+  ];
+  selectedCourse = null;
+  courseSetting = {
+    singleSelection: true,
+    idField: 'code',
+    textField: 'code',
+    selectAllText: 'Select All',
+    unSelectAllText: 'UnSelect All',
+    allowSearchFilter: true,
+    closeDropDownOnSelection: true
+  };
+  config = {
+    data: [],
+    pageIndex: 1,
+    pageSize: this.sizes[0],
+    totalElement: 0
+  };
+
+  constructor(private examSV: ExamService, private courseSV: CourseService, private messageSV: MessageService) {
+  }
+
+  ngOnInit() {
+    this.selectedCourse = [this.courses[0]];
+
+    const combine = combineLatest(
+      this.getCourseApi(),
+      this.examSV.getUpdateList(null, this.config.pageIndex, this.config.pageSize)
+    );
+
+    combine.subscribe((el: any) => {
+      this.courses = this.courses.concat(el[0]);
+      const paging = JSON.parse(el[1].headers.get('paging-header')) as any;
+      this.config.data = el[1].body as any;
+      this.config.pageSize = paging.pageSize;
+      this.config.pageIndex = paging.pageIndex;
+      this.config.totalElement = paging.totalElement;
+    }, er => console.log(er));
+  }
+
+  changeCourse(course) {
+    if (this.type === 'set') {
+      this.examSV.getUpdateList(course != this.courses[0] ? course : null, this.config.pageIndex, this.config.pageSize)
+        .subscribe((el: any) => {
+          const paging = JSON.parse(el.headers.get('paging-header')) as any;
+          this.config.data = el.body as any;
+          this.config.pageSize = paging.pageSize;
+          this.config.pageIndex = paging.pageIndex;
+          this.config.totalElement = paging.totalElement;
+        }, er => this.config.data = []);
+    } else {
+      this.examSV.getWaitToApprove(course != this.courses[0] ? course : null, this.config.pageIndex, this.config.pageSize)
+        .subscribe((el: any) => {
+          const paging = JSON.parse(el.headers.get('paging-header')) as any;
+          this.config.data = el.body as any;
+          this.config.pageSize = paging.pageSize;
+          this.config.pageIndex = paging.pageIndex;
+          this.config.totalElement = paging.totalElement;
+        }, er => this.config.data = []);
+    }
+  }
+
+  changeType(type) {
+    this.type = type;
+    this.config = {
+      data: [],
+      pageIndex: 1,
+      pageSize: this.sizes[0],
+      totalElement: 0
+    };
+    this.selectedCourse = [this.courses[0]];
+    this.changeCourse(this.selectedCourse);
+  }
+
+  getCourseApi() {
+    return this.courseSV.getAllCourse();
+  }
+
+  edit(id) {
+    this.examSV.getBaseTest(id).subscribe(el => {
+      this.messageSV.createModal(el, UpdateModalComponent, {
+        initialState: {
+          data: el,
+          returnDt: null
+        }
+      }).subscribe((sv: any) => {
+        if (sv) {
+          if (sv.success) {
+            this.changeCourse(this.selectedCourse);
+          }
+        }
+      });
+    }, er => console.log(er));
+  }
+
+  setPage(page) {
+    this.config.pageIndex = page;
+    this.changeCourse(this.selectedCourse[0]);
+  }
+
+  changeSize(size) {
+    this.config.pageSize = size;
+    this.changeCourse(this.selectedCourse);
+  }
+
+}

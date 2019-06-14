@@ -1,0 +1,29 @@
+@import "../../../../assets/css/theme";
+
+.box-contain {
+  min-height: 600px;
+}
+
+.main-title {
+  color: red;
+}
+
+.scroll-container {
+  overflow: auto;
+  height: 600px;
+  p {
+    margin-bottom: 5px;
+  }
+}
+
+fieldset {
+  border: 2px solid $main-cl !important;
+  legend {
+    padding: 0 10px;
+    width: auto;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: $second-main-cl;
+  }
+}

@@ -1,0 +1,41 @@
+<tabset>
+  <tab (select)="setDefault('lo')" heading="Learning OutCome" id="LO">
+    <fieldset class="p-4 border-dark border">
+      <legend><input style="width: 20px;height: 20px; margin-right: 5px" [ngModel]="isSelectedAll()" type="checkbox"
+                     (click)="setAll()">List of Learning Outcome
+      </legend>
+      <div class="container-box">
+        <div class="alert alert-success" *ngFor="let lo of listLO; let i = index;">
+          <label class="mb-0 title" [attr.for]="'LO'+ i">
+            <input (change)="addToList(lo)" type="checkbox" name="learning" [(ngModel)]="lo.checked"
+                   [attr.id]="'LO' + i">
+            {{lo.name}}
+          </label>
+        </div>
+      </div>
+    </fieldset>
+  </tab>
+  <tab (select)="setDefault('chapter')" heading="Chapter" id="Chapter">
+    <fieldset class="p-4 border-dark border">
+      <legend><input style="width: 20px;height: 20px; margin-right: 5px" [ngModel]="isSelectedAll()" type="checkbox"
+                     (click)="setAll()">List of Chapter
+      </legend>
+      <div class="container-box">
+        <div class="alert alert-success" *ngFor="let c of listChapter; let i = index;">
+          <label class="mb-0 title" [attr.for]="'Chapter'+ i">
+            <input (change)="addToList(c)" type="checkbox" name="learning" [(ngModel)]="c.checked" [attr.id]="'c' + i">
+            {{c.name}}
+          </label>
+        </div>
+      </div>
+    </fieldset>
+  </tab>
+  <div class="mt-4 d-flex">
+    <button class="btn btn-info mr-auto" (click)="createExam(type)">Random base on {{type === 'chapter' ? 'Chapter'
+      : 'Learning Outcome'}}
+    </button>
+    <button class="btn btn-info" [disabled]="getCheckedSelect().length === 0" (click)="verifyStep()">Custom Exam
+      Content
+    </button>
+  </div>
+</tabset>

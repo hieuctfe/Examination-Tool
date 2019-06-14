@@ -1,0 +1,21 @@
+<div class="card-body">
+  <div class="d-flex">
+    <div style="width: calc(100% - 51.27px)">
+      <div (click)="collapse = !collapse">
+        <p>
+          <b>Question level {{question.level}}</b>: <span [innerHtml]="question.content"></span>
+        </p>
+      </div>
+      <div [collapse]="collapse">
+        <p [ngClass]="o.isCorrect ? 'text-danger': ''" *ngFor="let o of question.options; let i = index">
+          {{GlobalVariable.DATA_LIST[i]}}. {{o.content}}
+        </p>
+      </div>
+    </div>
+    <div *ngIf="type === 'question'" class="pl-2 pr-2">
+      <button (click)="destroy.emit(question.id)" class="btn btn-danger">
+        <i class="ion ion-md-close"></i>
+      </button>
+    </div>
+  </div>
+</div>

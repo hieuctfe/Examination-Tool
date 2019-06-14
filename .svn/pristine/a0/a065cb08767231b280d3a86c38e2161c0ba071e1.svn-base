@@ -1,0 +1,162 @@
+<div class="container pt-4">
+  <a [routerLink]="['/View']" class="d-inline-block mb-4" style="text-decoration: underline; color: #0c5460">
+    <i class="ion ion-md-arrow-round-back"></i>
+    Back to Index</a>
+  <h4 class="mb-4 text-danger text-center">
+    LIST OF CURRENT REQUEST MATCHING
+  </h4>
+  <table [ngClass]="(!listData || listData.length === 0) ? 'table': 'table  table-hover'">
+    <thead>
+      <tr>
+        <th>Course</th>
+        <th>Total Question</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let q of listData; let i = index ">
+        <tr>
+          <td>{{q.courseCode}}</td>
+          <td>{{q.total}}</td>
+          <td>{{q.total === q.current ? 'Done' : 'Matching'}}</td>
+          <td>
+            <button class="btn btn-info  mr-2" (click)="setContent(q)" tooltip="Detail">
+              <i class="ion ion-md-information-circle-outline"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-container *ngIf="!listData || listData.length === 0">
+        <tr>
+          <td colspan="6" class="text-center text-danger">No matching request is available</td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+  <div *ngIf="contentData" class="pt-4 pb4">
+    <tabset>
+      <tab heading="Detail">
+        <div class="pt-4 pb-4">
+          <div class="progress">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0"
+              aria-valuemax="100" [style.width]="getPercent() + '%'"></div>
+          </div>
+          <div class="text-center mt-4">
+            <b>
+              <span class="text-danger">
+                {{contentData.current}} / {{contentData.total}}
+              </span>
+              questions has been checked ( {{getPercent()}}% )
+            </b>
+          </div>
+          <div class="text-center mt-4 mb-4">
+            <div class="card border-0 align-items-center">
+              <div style="width: 500px; border: 1px solid black; background: lightgoldenrodyellow" class="card-body border-dark p-4">
+                <table class="table w-100">
+                  <tr class="border-0">
+                    <td class="border-0 text-center" colspan="2">
+                      <h5>RESULT</h5>
+                    </td>
+                  </tr>
+                  <tr class="border-0">
+                    <td class="border-0 text-left"><b class="text-success">Success :</b></td>
+                    <td class="border-0 text-right font-weight-bold">{{contentData.success}}
+                    </td>
+                  </tr>
+                  <tr class="border-0">
+                    <td class="border-0 text-left"><b class="text-warning">May duplicated :</b></td>
+                    <td class="border-0 text-right font-weight-bold">{{contentData.sameQuestion.length}}</td>
+                  </tr>
+                  <tr class="border-0">
+                    <td class="border-0 text-left"><b class="text-danger">Fail :</b></td>
+                    <td class="border-0 text-right font-weight-bold">{{contentData.fail}}</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-6">
+              <h5 class="text-center">Questions can be duplicated</h5>
+            </div>
+            <div class="col-6">
+              <h5 class="text-center">Questions in Question Bank</h5>
+            </div>
+          </div>
+          <ng-container *ngIf="contentData.current === contentData.total">
+            <div  class="swiper-container" [swiper]="config" >
+              <div class="swiper-wrapper">
+                <div class="swiper-slide p-4" *ngFor="let q of contentData.sameQuestion; let i = index; let last = last">
+                  <div class="row">
+                    <div class="col-6">
+                      <div #col1 class="card">
+                        <div class="card-body d-flex">
+                          <div class="question-box">
+                            <p>
+                              <b>Question</b>:
+                              <span [innerHTML]="q.questionUploaded.content"></span>
+                            </p>
+                            <p>
+                              <b>Options:</b>
+                            </p>
+                            <p *ngFor="let an of q.questionUploaded.options; let index = index">
+                              {{GlobalVariable.DATA_LIST[index]}}.
+                              <span [innerHTML]="an.content"></span>
+                            </p>
+                          </div>
+                          <div class="button-box">
+                            <button (click)="remove(i)" class="btn btn-danger mr-2">
+                              <i class="ion ion-md-close"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="overflow-y: scroll" #col2 [style.max-height]="col1.offsetHeight + 'px'" class="col-6">
+                      <div class="scroll-container">
+                        <div class="card" [ngClass]="last? '': 'mb-4'" *ngFor="let qn of q.sameQuestions; let last = last">
+                          <div class="card-body d-flex">
+                            <div class="question-box">
+                              <p>
+                                <b>Question <span class="text-danger">( Match : {{qn.percent}}% )</span></b>:
+                                <span [innerHTML]="qn.content"></span>
+                              </p>
+                              <p>
+                                <b>Options:</b>
+                              </p>
+                              <p *ngFor="let an of qn.options; let index = index">
+                                {{GlobalVariable.DATA_LIST[index]}}.
+                                <span [innerHTML]="an.content"></span>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="contentData.sameQuestion.length === 0" class="swiper-slide">
+                  <div class="card w-100">
+                    <div class="card-body text-center">
+                    <span class="text-danger ">
+                      There is no question
+                    </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="btn "></div>
+              <div class="swiper-scrollbar" [hidden]="config.scrollbar === false"></div>
+            </div>
+            <div  class="w-100 mt-4">
+              <div class="text-center mb-4">
+                <button class="btn btn-info" (click)="verify()">Verify</button>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </tab>
+    </tabset>
+  </div>
+</div>

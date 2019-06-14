@@ -1,0 +1,86 @@
+import {Component, OnInit} from '@angular/core';
+import {ChapterService} from '../../../../services/chapter.service';
+import {LoService} from '../../../../services/lo.service';
+import {BsModalRef} from 'ngx-bootstrap';
+import {LevelService} from '../../../../services/level.service';
+import {combineLatest} from 'rxjs';
+import {QuestionMultipleChoice} from '../../../../model/question-multichoice.model';
+import swal from 'sweetalert2';
+import {QuestionService} from '../../../../services/question.service';
+
+@Component({
+  selector: 'Mex-edit-question-modal',
+  templateUrl: './edit-question-modal.component.html',
+  styleUrls: ['./edit-question-modal.component.scss']
+})
+export class EditQuestionModalComponent implements OnInit {
+  typeData: any;
+  data: QuestionMultipleChoice;
+  returnDt: any;
+  finishLoading = false;
+  chapter: any;
+  lo: any;
+  level: any;
+  idTest: number;
+
+  constructor(public modalRef: BsModalRef, private levelSV: LevelService,
+              private chapterSV: ChapterService, private loSV: LoService, private questionSV: QuestionService) {
+  }
+
+  ngOnInit() {
+    this.mergeApi();
+    this.typeData = {
+      value: 1,
+      listType: [
+        {
+          id: 1,
+          name: 'Multi Choice'
+        },
+        {
+          id: 2,
+          name: 'Reading'
+        },
+        {
+          id: 3,
+          name: 'Matching'
+        },
+        {
+          id: 4,
+          name: 'Indicate Mistake'
+        },
+        {
+          id: 5,
+          name: 'Fill Blank'
+        }
+      ]
+    };
+  }
+
+  mergeApi() {
+    const combine = combineLatest(
+      this.levelSV.getLevel(),
+      this.chapterSV.getChapterBaseOnCourse('Prx301'),
+      this.loSV.getLoBaseOnCourseList('Prx301')
+    );
+
+    combine.subscribe((el: any) => {
+      this.level = el[0];
+      this.chapter = el[1];
+      this.lo = el[2];
+      this.finishLoading = true;
+    }, er => console.log(er));
+  }
+
+  returnData(data) {
+    data.baseTestId = this.idTest;
+    this.questionSV.updateQuestion(data).subscribe(el => {
+      swal('Success', 'Question has been changed', 'success');
+      this.returnDt = {
+        success: true,
+      };
+      this.modalRef.hide();
+    }, el => {
+      swal('Error', 'Some error has occurred', 'error');
+    });
+  }
+}

@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAGA,SAAU;EACR,gBAAgB,EAAE,kBAAmB;;AAGvC,cAAe;EACb,KAAK,EAAE,KAAK;;AAGd,cAAe;EACb,gBAAgB,EAAE,kBAA0B;;ACX9C,WAAY;EACV,UAAU,EAAE,OAAO",
+"sources": ["../../../../../assets/css/theme.scss","manage-question.component.scss"],
+"names": [],
+"file": "manage-question.component.css"
+}

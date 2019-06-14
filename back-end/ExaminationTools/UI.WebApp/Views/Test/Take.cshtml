@@ -1,0 +1,118 @@
+﻿@model TestVM
+@{
+    int count = Model.Questions.Count;
+    ViewBag.SubjectCode = Model.Course;
+    ViewBag.StudentCode = Model.StudentCode;
+    ViewBag.StudentName = Model.StudentName;
+};
+@section PreScripts
+{
+    <script type="text/javascript">
+        var examID = "@Model.Id";
+    </script>
+    <script src="@Url.AppCustoms("js/flag.js")"></script>
+
+}
+
+@section Scripts
+{
+
+    <script type="text/javascript">
+        var timeOutHandle = function () {
+            document.getElementById("timer").innerHTML = "EXPIRED";
+            $('#nopbai').click();
+        };
+        timer(@Model.Duration.TotalSeconds).then(timeOutHandle);
+
+
+        $('#nopbai').on('click', function () {
+            var contents = {
+                __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val(),
+                testId: '@Model.Id',
+                results: getAnw()
+            };
+            $.ajax({
+                url: '@Url.Action("Submit")',
+                method: 'POST',
+                data: contents
+            }).done(function (data) {
+                window.location = `/Test/ShowMark/${data}`;
+                }).fail(function () {
+                    window.location = '@Url.Action("Error", new { errors = "Bring Your Laptop To IT To Submit" })';
+                });
+        });
+    </script>
+}
+@Html.AntiForgeryToken()
+<div class="body-exam row">
+    <div class="question-num col-md-2">
+        <ul class="row">
+            @for (int i = 1; i <= count; i++)
+            {
+                <li class="col-md-2">
+                    <a href="#@Model.Questions[i - 1].QuestionCode"><p num-data="@Model.Questions[i - 1].QuestionCode" class="">@i</p></a>
+                </li>
+            }
+        </ul>
+        <button data-toggle="modal" data-target="#myModal" class="btn submit-exam">Submit</button>
+    </div>
+    <div class="question-info col-md-10">
+        <div class="">
+            @for (int i = 0; i < count; i++)
+            {
+                <div id="@Model.Questions[i].QuestionCode" class="quest col-md-12 row">
+                    <div class="num-flag col-md-2">
+                        <p>
+                            <b>Question @(i + 1)</b>
+                            <span data-flag-id="@Model.Questions[i].QuestionCode"></span>
+                        </p>
+                    </div>
+                    <div class="text-question col-md-10 card">
+                        <div class="card-body">
+                            <p>
+                                <span>
+                                    @Html.Raw(Model.Questions[i].Content)
+                                </span>
+                            </p>
+                            <ul class="list-aw">
+                                @{ char character = 'A'; }
+                                @foreach (var option in Model.Questions[i].Options)
+                                {
+                                    switch (Model.Questions[i].Type)
+                                    {
+                                        case 1:
+                                            <li><input type="checkbox" value="@option.Id" name="@option.Id">@(character++). @Html.Raw(option.Content)</li>
+                                            break;
+                                        default:
+                                            <li><input type="radio" value="@option.Id" name="@Model.Questions[i].QuestionCode">@(character++). @Html.Raw(option.Content)</li>
+                                            break;
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Warning</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                Summit the exam?
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="nopbai" class="btn btn-outline-primary" style="margin: auto"
+                        data-dismiss="modal">
+                    Summit
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,13 @@
+.btn-info {
+  background-color: #4ba89c !important; }
+
+.btn-warning i {
+  color: white; }
+
+.btn-secondary {
+  background-color: #20897b !important; }
+
+.hidden-row {
+  background: #F5F4FF; }
+
+/*# sourceMappingURL=manage-question.component.css.map */

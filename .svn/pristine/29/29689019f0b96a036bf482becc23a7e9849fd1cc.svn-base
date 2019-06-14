@@ -1,0 +1,34 @@
+<div  class="modal-header d-flex">
+  <h4 class="modal-title pull-left mr-auto">Question Information</h4>
+  <button class="btn btn-danger" (click)="modalRef.hide()">
+    <i class="ion ion-md-close" ></i>
+  </button>
+</div>
+<div *ngIf="finishLoading" class="modal-body">
+  <div class="form-group mb-4">
+    <label for="type">Question type</label>
+    <select class="form-control" name="type" [(ngModel)]="typeData.value" id="type">
+      <option value="-1" selected disabled>Xin hãy chọn dạng câu hỏi</option>
+      <option *ngFor="let t of typeData.listType" [value]="t.id">{{t.name}}</option>
+    </select>
+  </div>
+  <ng-container [ngSwitch]="typeData.value">
+    <ng-container *ngSwitchCase="1 || 4">
+      <Mex-multichoice-template [level]="level" [chapter]="chapter" [lo]="lo" [data]="data" (action)="returnData($event)"></Mex-multichoice-template>
+    </ng-container>
+    <ng-container *ngSwitchCase="2">
+      2
+    </ng-container>
+    <ng-container *ngSwitchCase="3">
+      3
+    </ng-container>
+    <ng-container *ngSwitchCase="5">
+      4
+    </ng-container>
+    <ng-container *ngSwitchCase="6">
+      5
+    </ng-container>
+    <ng-container *ngSwitchDefault>
+    </ng-container>
+  </ng-container>
+</div>

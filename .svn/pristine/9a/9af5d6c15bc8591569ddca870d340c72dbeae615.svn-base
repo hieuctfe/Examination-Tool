@@ -1,0 +1,83 @@
+<wizard [navigationMode]="'semi-strict'" navBarLayout="large-empty-symbols" #wizard>
+  <wizard-step stepTitle="Find Course">
+    <div class="card">
+      <div class="card-body">
+        <Mex-verify-course [exam]="exam"></Mex-verify-course>
+        <div class="d-flex ">
+          <div class="mr-auto"></div>
+          <button [disabled]="!(exam.course?.length > 0)" type="button"
+                  class="btn btn-info" (click)="nextStep({step : 1})">Next
+          </button>
+        </div>
+      </div>
+    </div>
+  </wizard-step>
+  <wizard-step stepTitle="Exam Detail">
+    <div *ngIf="wizard.navigation && wizard.navigation.wizardState.currentStepIndex === 1" class="card">
+      <div class="card-body">
+        <Mex-setting-exam #setting [form]="settingForm" (formChange)="setForm($event)"
+                          [(exam)]="exam"></Mex-setting-exam>
+        <div class="d-flex pt-4">
+          <button type="button" class="btn btn-warning mr-auto" previousStep>Previous</button>
+          <button type="button" class="btn btn-info" (click)="nextStep({step : 2})">Next</button>
+        </div>
+      </div>
+    </div>
+  </wizard-step>
+  <wizard-step stepTitle="Setting Learning Outcomes or Chapters">
+    <div *ngIf="wizard.navigation && wizard.navigation.wizardState.currentStepIndex >= 2" class="card">
+      <div class="card-body">
+        <Mex-setting-lo [exam]="exam" [listChapter]="listChapter" [listLO]="listLO"
+                        (examChange)="nextStep($event)"></Mex-setting-lo>
+        <div class="d-flex pt-4">
+          <button type="button" class="btn btn-warning mr-auto" previousStep>Previous</button>
+        </div>
+      </div>
+    </div>
+  </wizard-step>
+  <wizard-step stepTitle="Exam Content">
+    <div *ngIf="wizard.navigation && wizard.navigation.wizardState.currentStepIndex >= 3" class="card">
+      <div class="card-body">
+        <Mex-set-content-exam [exam]="exam"></Mex-set-content-exam>
+        <div class="d-flex pt-4">
+          <button type="button" class="btn btn-warning mr-auto" previousStep>Previous</button>
+          <button type="button" [disabled]="!(exam.listQuestion.length == exam.settingCourse.numberOfQuesion)" class="btn btn-info" (click)="generateTest()">Next</button>
+        </div>
+      </div>
+    </div>
+  </wizard-step>
+  <wizard-step stepTitle="Finish">
+    <div *ngIf="wizard.navigation && wizard.navigation.wizardState.currentStepIndex >= 4">
+      <div class="text-center" *ngIf="finalData && exam">
+        <div class="card border-0 align-items-center">
+          <div style="width: 500px; border: 1px solid black; background: lightgoldenrodyellow"
+               class="card-body border-dark p-4">
+            <h4 class="text-center">Course :
+              <b class="text-danger">{{exam.course[0]}}</b>
+            </h4>
+            <table class="table w-100">
+              <tr class="border-0">
+                <td class="border-0 text-left">Number of Test :</td>
+                <td class="border-0 text-right font-weight-bold">{{finalData.numberOfTest}}
+                </td>
+              </tr>
+              <tr class="border-0">
+                <td class="border-0 text-left">Number of questions :</td>
+                <td class="border-0 text-right font-weight-bold">{{finalData.numberOfQuestion}}</td>
+              </tr>
+              <tr class="border-0">
+                <td class="border-0 text-left">Duration :</td>
+                <td class="border-0 text-right font-weight-bold">{{finalData.duration}}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="d-flex pt-4">
+        <span class="mr-auto"></span>
+        <button type="button" class="btn btn-info" (click)="reset()">Finish</button>
+        <span class="ml-auto"></span>
+      </div>
+    </div>
+  </wizard-step>
+</wizard>

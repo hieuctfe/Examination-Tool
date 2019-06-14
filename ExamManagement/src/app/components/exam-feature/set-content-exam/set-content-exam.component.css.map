@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAGA,SAAU;EACR,gBAAgB,EAAE,kBAAmB;;AAGvC,cAAe;EACb,KAAK,EAAE,KAAK;;AAGd,cAAe;EACb,gBAAgB,EAAE,kBAA0B;;ACV9C,YAAa;EACX,UAAU,EAAE,KAAK;;AAGnB,WAAY;EACV,KAAK,EAAE,GAAG;;AAGZ,iBAAkB;EAChB,QAAQ,EAAE,IAAI;EACd,MAAM,EAAE,KAAK;EACb,mBAAE;IACA,aAAa,EAAE,GAAG;;AAItB,QAAS;EACP,MAAM,EAAE,4BAA6B;EACrC,eAAO;IACL,OAAO,EAAE,MAAM;IACf,KAAK,EAAE,IAAI;IACX,SAAS,EAAE,IAAI;IACf,aAAa,EAAE,QAAQ;IACvB,WAAW,EAAE,MAAM;IACnB,KAAK,EDzBQ,OAAO",
+"sources": ["../../../../assets/css/theme.scss","set-content-exam.component.scss"],
+"names": [],
+"file": "set-content-exam.component.css"
+}

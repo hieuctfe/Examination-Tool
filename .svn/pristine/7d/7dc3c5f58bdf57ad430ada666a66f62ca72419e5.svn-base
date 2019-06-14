@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,KAAK;EACH,WAAW,EAAE,IAAI",
+"sources": ["multichoice-template.component.scss"],
+"names": [],
+"file": "multichoice-template.component.css"
+}

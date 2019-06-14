@@ -1,0 +1,38 @@
+{
+  "data": [
+    {
+    "AppName": "5bb6e219d579d4db2397444f",
+    "ProcessName": 0,
+    "Path": "8ff90322-018b-4910-92c2-99b8291ed93f"
+  },
+  {
+    "AppName": "5bb6e2196bf164b6083a97d5",
+    "ProcessName": 1,
+    "Path": "b56a8196-76d4-4116-86da-64e2ba5e1396"
+  },
+  {
+    "AppName": "5bb6e2191c73833f9766198b",
+    "ProcessName": 2,
+    "Path": "ed89563a-4dba-4172-a899-70d2c9026753"
+  },
+  {
+    "AppName": "5bb6e2197517d5aaa44c51bc",
+    "ProcessName": 3,
+    "Path": "4f302296-ec6e-4ea0-8f2c-3cb76f731259"
+  },
+  {
+    "AppName": "5bb6e219f7c12399135f8047",
+    "ProcessName": 4,
+    "Path": "09eb5055-3821-4ff6-9ed4-06cdacaf189a"
+  },
+  {
+    "AppName": "5bb6e2198d76f5a04d3576f0",
+    "ProcessName": 5,
+    "Path": "961fcb8d-022c-4005-946e-8c58f67b0dde"
+  },
+  {
+    "AppName": "5bb6e219cbfb3129e4274908",
+    "ProcessName": 6,
+    "Path": "7394a62f-7bbc-4bd5-819e-fd39ac9280b6"
+  }
+]}

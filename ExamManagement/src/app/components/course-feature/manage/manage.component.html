@@ -1,0 +1,19 @@
+<div *ngIf="course" id="manage-segment">
+  <div class="d-flex">
+    <ng-container *ngIf="user?.roles.indexOf('Leader') !== -1">
+      <button [ngClass]="state === 'lo' ? 'btn-info' : ''" (click)="state = 'lo'" class="btn w-50 mr-2"
+              [routerLink]="['LO']">Manage Learning Outcome
+      </button>
+      <button [ngClass]="state === 'chapter' ? 'btn-info' : ''" (click)="state = 'chapter'" class="btn w-50 mr-2"
+              [routerLink]="['Chapter']">Manage Chapter
+      </button>
+    </ng-container>
+    <button [ngClass]="state === 'question' ? 'btn-info' : ''"
+            (click)="state = 'question'" class="btn w-50"
+            [routerLink]="['Question']">Manage Question Bank
+    </button>
+  </div>
+  <ng-container *ngIf="state">
+    <router-outlet></router-outlet>
+  </ng-container>
+</div>

@@ -1,0 +1,119 @@
+import {Component, OnInit} from '@angular/core';
+import {DepartmentService} from '../../../services/department.service';
+import {CourseService} from '../../../services/course.service';
+import {Route, Router} from '@angular/router';
+import {map} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {MessageService} from '../../../services/message.service';
+import {ModalCourseComponent} from '../modal-course/modal-course.component';
+import {Course} from '../../../model/course.model';
+import swal from 'sweetalert2';
+import {UserService} from '../../../services/user.service';
+
+@Component({
+  selector: 'Mex-course',
+  templateUrl: './course.component.html',
+  styleUrls: ['./course.component.scss']
+})
+export class CourseComponent implements OnInit {
+  departments: Observable<any[]>;
+  expandList = [];
+  course = null;
+  user: any;
+
+  constructor(private departSV: DepartmentService,
+              private courseSV: CourseService,
+              private messageSV: MessageService,
+              private router: Router, private userSV: UserService) {
+  }
+
+  ngOnInit() {
+    this.user = this.userSV.getUser;
+    this.loadDepartment();
+  }
+
+  loadDepartment() {
+    this.departments = this.departSV.getAllDepartment().pipe(map((response: any) => {
+      return response;
+    }));
+  }
+
+  loadCourse = (data) => this.courseSV.getCourseByDepartment(data.code).pipe(map((response: any) => {
+    return response.map(el => {
+      return {
+        code: el.code,
+        name: el.name,
+        department: el.department,
+        child: true
+      };
+    });
+  }));
+
+  setCourse(source) {
+    if (source.originalEvent.target.classList[0].indexOf('ion') === -1) {
+      if (source.item.dataItem && source.item.dataItem.child) {
+        // this.course = source.item.dataItem;
+        // if (this.user && this.user.roles.indexOf('Examinator') === -1) {
+          this.router.navigateByUrl('View/Course/Manage/' + source.item.dataItem.code);
+        // }
+      } else {
+        if (this.expandList.indexOf(source.item.index) !== -1) {
+          const index = this.expandList.indexOf(source.item.index);
+          this.expandList.splice(index, 1);
+        } else {
+          this.expandList.push(source.item.index);
+        }
+      }
+    }
+  }
+
+  hasCourse(item: any) {
+    return 'name' in item;
+  }
+
+  showModal(source, code) {
+    console.log(code);
+    this.messageSV.createModal(source, ModalCourseComponent, {
+      initialState: {
+        data: source ? source : new Course().deserialize({department: code, code: '', name: ''}),
+        type: source ? 'edit' : 'create',
+        returnDt: null
+      }
+    }).subscribe((rs: any) => {
+      if (rs) {
+        swal('Sucess', rs, 'success');
+        this.loadDepartment();
+      }
+    });
+  }
+
+  delete(source) {
+    swal({
+      title: 'Are you sure?',
+      text: 'Course ' + source.code + ' will be deleted!',
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonClass: 'btn btn-info',
+      cancelButtonClass: 'btn'
+    }).then(result => {
+      if (result.value) {
+        this.courseSV.delete(source.code).subscribe(sc => {
+          swal(
+            'Deleted!',
+            'Question has been deleted',
+            'success'
+          );
+          this.loadDepartment();
+        }, er => {
+          swal(
+            'Error',
+            'Some error has occurred',
+            'error'
+          );
+        });
+      }
+    });
+  }
+}

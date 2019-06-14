@@ -1,0 +1,54 @@
+<div id="footer">
+  <div class="footer-main p-4">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="footer-desc">
+          <div class="pb-3">
+            <a class="logo" routerLink="Index">
+              <img src="assets/image/logo_fug.jpg" width="183"
+                   height="67" alt="Eguru">
+            </a>
+          </div>
+          <p>Dream of Innovation.</p></div>
+      </div>
+      <div class="col-md-2">
+        <div class="footer-nav">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="http://daihoc.fpt.edu.vn">About Us</a></li>
+            <li><a href="http://daihoc.fpt.edu.vn">Terms of use</a></li>
+            <li><a href="http://daihoc.fpt.edu.vn">FAQ</a></li>
+            <li><a href="http://daihoc.fpt.edu.vn">Support</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="social-media">
+          <h4>Follow Us</h4>
+          <ul>
+            <li class="smedia-01">
+              <a href="https://www.facebook.com/yourfacebookid" target="_blank">
+                                	<span class="media-icon">
+                                    <i class="ion ion-logo-facebook"></i>
+                                    </span>
+                <span class="media-name">Facebook</span>
+              </a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="footer-contact">
+          <h4>Contact</h4>
+          <p>Innovation Building, QTSC, D.12, HCM City</p>
+          <p><i class="fa fa-phone-square"></i>Phone: (848) 543 711 97</p>
+          <p><i class="fa fa-envelope"></i>
+            E-mail: <a class="mail-link" href="mailto:ykien@fpt.edu.vn">ykien@fpt.edu.vn</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

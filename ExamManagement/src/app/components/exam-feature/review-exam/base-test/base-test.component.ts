@@ -1,0 +1,130 @@
+import { CourseService } from './../../../../services/course.service';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ExamService } from '../../../../services/exam.service';
+import swal from 'sweetalert2';
+import { UserService } from '../../../../services/user.service';
+
+@Component({
+  selector: 'Mex-base-test',
+  templateUrl: './base-test.component.html',
+  styleUrls: ['./base-test.component.scss']
+})
+export class BaseTestComponent implements OnInit {
+  baseTests = [];
+  user: any;
+  tab: string;
+  isApproved = null;
+  courses = ['All'];
+  selectedCourse = ['All'];
+  today = new Date();
+  courseSetting = {
+    singleSelection: true,
+    idField: 'code',
+    textField: 'code',
+    selectAllText: 'Select All',
+    unSelectAllText: 'UnSelect All',
+    allowSearchFilter: true,
+    closeDropDownOnSelection: true
+  };
+  sizes = [
+    10, 25, 50
+  ];
+  config = {
+    pageIndex: 1,
+    pageSize: this.sizes[0],
+    totalElement: 0
+  };
+
+
+  constructor(private router: Router, private route: ActivatedRoute,
+    private examSV: ExamService, private courseSV: CourseService, private userSV: UserService) {
+  }
+
+  async ngOnInit() {
+    this.userSV.getUser.subscribe(el => {
+      this.user = el;
+    });
+    this.courseSV.getAllCourse().subscribe((el: Array<any>) => {
+      this.courses = this.courses.concat(el);
+    }, er => console.log(er));
+    this.tab = this.user.roles.indexOf('Lecturer') !== -1 ? 'wait' : 'release';
+    this.loadTestBaseOnCode(this.tab);
+  }
+
+  changeCourse(course) {
+    this.selectedCourse = [course];
+    console.log(this.selectedCourse[0]);
+    this.examSV.getResultTeacher(this.selectedCourse[0] != this.courses[0]
+      ? this.selectedCourse[0] : null, this.config)
+      .subscribe((resp: any) => {
+        const paging = JSON.parse(resp.headers.get('paging-header')) as any;
+        this.baseTests = resp.body;
+        if (paging) {
+          this.config = {
+            pageIndex: paging.pageIndex,
+            pageSize: paging.pageSize,
+            totalElement: paging.totalElement
+          };
+        }
+      }, er => this.baseTests = []);
+  }
+
+  loadTestBaseOnCode(type, event = null) {
+    this.tab = type;
+    switch (type) {
+      case 'wait': {
+        this.selectedCourse = null;
+        this.examSV.getBaseTestWaitForApproved().subscribe((el: any) => {
+          this.baseTests = el.map(l => {
+            return this.compareDate(l);
+          });
+        }, er => this.baseTests = []);
+        break;
+      }
+      case 'approve': {
+        this.selectedCourse = null;
+        this.isApproved = event;
+        this.examSV.getBaseTestApproveOrReject({ isApproved: this.isApproved }).subscribe((el: any) => {
+          this.baseTests = el;
+        }, er => this.baseTests = []);
+        break;
+      }
+      case 'release': {
+        this.selectedCourse = [this.courses[0]];
+        this.changeCourse(this.selectedCourse[0]);
+        break;
+      }
+    }
+  }
+
+  compareDate(object) {
+    const dateStart = Date.parse(object.startDate);
+    const dateEnd = Date.parse(object.endDate);
+    if (dateStart > this.today.getTime()) {
+      object.outOfDate = 'soon';
+    } else if (dateEnd < this.today.getTime()) {
+      object.outOfDate = 'out';
+    } else {
+      object.outOfDate = 'wait';
+    }
+    return object;
+  }
+
+  toggleStatus(value, data) {
+    this.examSV.publish(data.baseTestId).subscribe(el => this.loadTestBaseOnCode('release'), er => {
+      swal('Error', 'Cannot publish now', 'error');
+      this.loadTestBaseOnCode('release');
+    });
+  }
+
+  setPage(page) {
+    this.config.pageIndex = page;
+    this.changeCourse(this.selectedCourse[0]);
+  }
+
+  changeSize(size) {
+    this.config.pageSize = size;
+    this.changeCourse(this.selectedCourse[0]);
+  }
+}

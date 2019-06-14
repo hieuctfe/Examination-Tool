@@ -1,0 +1,18 @@
+<div class="container pt-4 pb-4 position-absolute w-100 form-container">
+  <div class="card card-container">
+    <h4 class="text-center title">Đăng nhập</h4>
+    <form action="" class="form-signin">
+      <span id="reauth-email" class="reauth-email"></span>
+      <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+      <input type="password" id="inputPassword" class="form-control" Placeholder="Password" required>
+      <a href="#" class=" d-block forgot-password pb-3">
+        Quên mật khẩu?
+      </a>
+      <button routerLink="/View" class="btn btn-lg mb-2 btn-primar btn-block btn-signin" type="button">Đăng nhập</button>
+    </form>
+    <button (click)="socialSignIn()" class="btn-google w-100">
+      <i class="ion ion ion-logo-google"></i>
+      Đăng nhập với mail@fpt.edu.vn
+    </button>
+  </div>
+</div>

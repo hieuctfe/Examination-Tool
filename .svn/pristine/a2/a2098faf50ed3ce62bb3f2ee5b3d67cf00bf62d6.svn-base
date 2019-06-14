@@ -1,0 +1,4 @@
+@import "../../../../../assets/css/theme";
+.hidden-row {
+  background: #F5F4FF;
+}

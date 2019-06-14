@@ -1,0 +1,20 @@
+﻿@model Core.ObjectModels.Entity.Test
+
+<div class="body-exam row">
+    <table class="generaltable quizattemptsummary table table-hover" border="1">
+        <thead>
+            <tr>
+                <th class="header c1" style="text-align:left;" scope="col">State</th>
+                <th class="header c2" style="text-align:center;" scope="col">Percent</th>
+                <th class="header c3" style="text-align:center;" scope="col">Grade / 10.00</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="lastrow">
+                <td class="cell c1" style="text-align:left;">Finished</td>
+                <td class="cell c3" style="text-align:center;">@(Model.Mark / Model.TotalMark * 100)</td>
+                <td class="cell c3" style="text-align:center;">@(Model.Mark / Model.TotalMark * 10)</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,31 @@
+.btn-info {
+  background-color: #4ba89c !important; }
+
+.btn-warning i {
+  color: white; }
+
+.btn-secondary {
+  background-color: #20897b !important; }
+
+li {
+  line-height: 44px;
+  transition: 0.3s all; }
+  li a {
+    text-decoration: none;
+    padding: 5px 30px;
+    color: black;
+    display: block;
+    width: 100%; }
+    li a .menu-icon {
+      top: 50%;
+      left: 20px;
+      -webkit-transform: translateY(-50%);
+      -moz-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      -o-transform: translateY(-50%);
+      transform: translateY(-50%); }
+
+li:hover {
+  background: rgba(50, 50, 50, 0.06); }
+
+/*# sourceMappingURL=side-bar.component.css.map */

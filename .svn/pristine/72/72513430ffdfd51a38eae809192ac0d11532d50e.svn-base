@@ -1,0 +1,45 @@
+<ng-container *ngIf="exam?.settingCourse">
+  <h4 class="mb-4">Course : {{exam.course[0].name}}</h4>
+  <form [formGroup]="form">
+    <div class="form-row mb-4">
+      <div class="col">
+        <label class="font-weight-bold">Number of Questions</label>
+        <input formControlName="numberOfQuesion" type="number" class="form-control">
+        <div *ngIf="submitted && form.controls['numberOfQuesion'].errors?.required" class="d-block invalid-feedback">
+          Number of Questions cannot be empty
+        </div>
+        <div *ngIf="submitted && form.controls['numberOfQuesion'].errors?.min" class="d-block invalid-feedback">
+          Min value is 1
+        </div>
+      </div>
+      <div class="col">
+        <label class="font-weight-bold">Duration (minute)</label>
+        <input type="number" formControlName="duration" class="form-control">
+        <div *ngIf="submitted && form.controls['duration'].errors?.required" class="d-block invalid-feedback">
+          Duration cannot be empty
+        </div>
+        <div *ngIf="submitted && form.controls['duration'].errors?.min" class="d-block invalid-feedback">
+          Min value is 1 (minute)
+        </div>
+        <div *ngIf="submitted && form.controls['duration'].errors?.max" class="d-block invalid-feedback">
+          Max value is {{23*60 +59}} (minute)
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="col">
+        <label class="font-weight-bold">Number of Tests</label>
+        <input formControlName="numberOfTest" type="number" class="form-control">
+        <small id="testHelp" class="form-text text-muted">If you generate Exam using Random feature, u may pass this
+          field.
+        </small>
+        <div *ngIf="submitted && form.controls['numberOfTest'].errors?.required" class="d-block invalid-feedback">
+          Number of Test cannot be empty
+        </div>
+        <div *ngIf="submitted && form.controls['numberOfTest'].errors?.min" class="d-block invalid-feedback">
+          Min value is 2
+        </div>
+      </div>
+    </div>
+  </form>
+</ng-container>

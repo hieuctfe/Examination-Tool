@@ -1,0 +1,32 @@
+@import "../../../assets/css/theme";
+
+.header-main {
+  background: $main-cl;
+}
+
+.header-menubar {
+  background: $second-main-cl;
+}
+
+.section-right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+#menu {
+  border: none;
+  background: transparent;
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: white;
+  transition: 0.5s all;
+  cursor: pointer;
+  &:focus{
+    background: $second-main-cl;
+    outline: none;
+  }
+  &:hover {
+    background: $second-main-cl;
+  }
+}

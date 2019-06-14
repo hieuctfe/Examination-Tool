@@ -1,0 +1,15 @@
+@import "../../../assets/css/theme";
+
+.progress-bar {
+  background-color: $main-cl;
+}
+
+.question-box {
+  max-width: 80%;
+  padding-right: 1.5rem;
+  margin-right: auto;
+
+  img {
+    width: 100% !important;
+  }
+}

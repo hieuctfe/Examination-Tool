@@ -1,0 +1,243 @@
+import {Component, OnInit, ViewChild} from '@angular/core';
+import {moment} from 'ngx-bootstrap/chronos/test/chain';
+import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from '@angular/forms';
+import {BsModalRef} from 'ngx-bootstrap';
+import {SemesterService} from '../../../services/semester.service';
+import swal from 'sweetalert2';
+import {CourseService} from '../../../services/course.service';
+import {ParserService} from '../../../services/parser.service';
+import {ExamService} from '../../../services/exam.service';
+import {combineLatest} from 'rxjs';
+
+@Component({
+  selector: 'Mex-examcode-modal',
+  templateUrl: './examcode-modal.component.html',
+  styleUrls: ['./examcode-modal.component.scss']
+})
+export class ExamcodeModalComponent implements OnInit {
+  @ViewChild('file') inputFile: any;
+  form: FormGroup;
+  students: FormArray;
+  returnDt: any;
+  submitted = false;
+  semester = [];
+  courses = [];
+  baseTests = [];
+  today = new Date();
+  data: any;
+  type: 'string';
+  dropdownSetting = {
+    singleSelection: true,
+    idField: 'code',
+    textField: 'code',
+    closeDropDownOnSelection: true,
+    allowSearchFilter: true
+  };
+  baseTestConfig = {
+    singleSelection: true,
+    idField: 'id',
+    textField: 'uiId',
+    closeDropDownOnSelection: true,
+    allowSearchFilter: true
+  };
+
+
+  constructor(public modalRef: BsModalRef, private fb: FormBuilder,
+              private semesterSV: SemesterService, private courseSV: CourseService,
+              private parserSV: ParserService, private examSV: ExamService) {
+  }
+
+  ngOnInit() {
+    console.log(this.data);
+    let combine = null;
+    let studentList = null;
+    if (this.data) {
+      combine = combineLatest(
+        this.semesterSV.getAllSemester(),
+        this.courseSV.getAllCourse(),
+        this.examSV.getPublish(this.data.semesterCode, this.data.courseCode));
+      studentList = this.data.students.map(el => {
+        return new FormControl(el, Validators.required);
+      });
+    } else {
+      combine = combineLatest(
+        this.semesterSV.getAllSemester(),
+        this.courseSV.getAllCourse());
+    }
+    combine.subscribe(el => {
+      this.semester = el[0];
+      this.courses = el[1];
+      if (this.data) {
+        this.baseTests = el[2];
+      }
+      this.form = this.fb.group({
+        semester: new FormControl(this.data
+          ? this.mappingSemester(this.data.semesterCode) : '', Validators.required),
+        course: new FormControl(this.data
+          ? this.mappingCourse(this.data.courseCode) : '', Validators.required),
+        baseTest: new FormControl(this.data
+          ? this.data.baseTestId : '', Validators.required),
+        code: new FormControl(this.data ? this.data.code : '', Validators.required),
+        startDate: new FormControl(this.data
+          ? moment(this.data.startDate, 'YYYY-MM-DDTHH:mm:ssZ').toDate() : new Date(), Validators.required),
+        endDate: new FormControl(this.data
+          ? moment(this.data.endDate, 'YYYY-MM-DDTHH:mm:ssZ').toDate() : new Date(), Validators.required),
+        students: new FormArray(studentList ? studentList : [], [Validators.required]),
+      });
+    });
+  }
+
+  mappingSemester(se) {
+    let semester = null;
+    this.semester.map(el => {
+      if (el.code === se) {
+        semester = el;
+      }
+    });
+    return semester ? [semester] : null;
+  }
+
+  mappingCourse(c) {
+    let course = null;
+    this.courses.map(el => {
+      if (el.code === c) {
+        course = el;
+      }
+    });
+    return course ? [course] : null;
+  }
+
+  mappingBaseTest(bt) {
+    let baseTest = null;
+    this.baseTests.map(el => {
+      if (el.id === bt) {
+        baseTest = el;
+      }
+    });
+    return baseTest ? [baseTest] : null;
+  }
+
+  renderCode() {
+    const semester = this.form.value.semester[0];
+    const baseTest = this.form.value.baseTest[0];
+    if (semester && baseTest) {
+      this.form.controls['code'].patchValue(semester.trim() + '_' + baseTest.id);
+    }
+  }
+
+  removeCourse() {
+    this.form.controls['course'].patchValue('');
+    this.form.controls['baseTest'].patchValue('');
+  }
+
+  removeSemester() {
+    this.form.controls['semester'].patchValue('');
+    this.form.controls['baseTest'].patchValue('');
+  }
+
+  async submit(form) {
+    this.submitted = true;
+    if (form.valid) {
+      if (!this.data) {
+        const data = {
+          semesterCode: this.form.value.semester[0],
+          courseCode: this.form.value.course[0],
+          code: this.form.value.code,
+          startDate: moment(this.form.value.startDate._d).format('YYYY-MM-DDTHH:mm:ssZ'),
+          endDate: moment(this.form.value.endDate._d).format('YYYY-MM-DDTHH:mm:ssZ'),
+          students: this.form.value.students,
+          baseTestId: this.form.value.baseTest[0].id
+        };
+        this.semesterSV.createExam(data).subscribe(() => {
+          this.returnDt = {
+            success: true
+          };
+          this.modalRef.hide();
+        }, () => {
+          swal({
+            type: 'error',
+            title: 'Error',
+            text: 'Cannot create new Exam Code',
+          });
+        });
+      } else {
+        const data = {
+          code: this.data.code,
+          startDate: moment(this.form.value.startDate._d).format('YYYY-MM-DDTHH:mm:ssZ'),
+          endDate: moment(this.form.value.endDate._d).format('YYYY-MM-DDTHH:mm:ssZ'),
+          students: this.form.value.students,
+          baseTestId: this.data.baseTestId
+        };
+        this.semesterSV.updateExam(data).subscribe(() => {
+          this.returnDt = {
+            success: true
+          };
+          this.modalRef.hide();
+        }, () => {
+          swal({
+            type: 'error',
+            title: 'Error',
+            text: 'Cannot update Exam Code',
+          });
+        });
+      }
+
+    }
+  }
+
+  readFile(event) {
+    const that = this;
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    if (file) {
+      reader.onload = function (e: any) {
+        const text = (e.target.result).trim();
+        const result = that.parserSV.parseExcelToJson(text);
+        if (result) {
+          result.forEach(el => {
+            el.forEach(st => {
+              that.addItem(st);
+            });
+          });
+        }
+      };
+      reader.readAsBinaryString(file);
+    }
+    that.inputFile.nativeElement.value = null;
+  }
+
+  createItem(data): FormGroup {
+    return this.fb.group({
+      fullName: data.FullName,
+      username: data.MemberCode ? data.MemberCode.toLowerCase() : ''
+    });
+  }
+
+  addItem(data): void {
+    this.students = this.form.get('students') as FormArray;
+    this.students.push(this.createItem(data));
+  }
+
+  dateValid() {
+    const sD = this.form.controls['startDate'].value;
+    const eD = this.form.controls['endDate'].value;
+    return sD > eD;
+  }
+
+  loadTest(data) {
+    const semester = this.form.value.semester[0];
+    const courseCode = this.form.value.course[0];
+    if (semester && courseCode) {
+      this.examSV.getPublish(semester, courseCode).subscribe(
+        (el: any) => this.baseTests = el,
+        er => swal('Error', 'Cannot get Publish Test', 'error'));
+    }
+  }
+
+  clear() {
+    this.students = this.form.get('students') as FormArray;
+    while (this.students.length !== 0) {
+      this.students.removeAt(0);
+    }
+  }
+}

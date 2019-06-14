@@ -1,0 +1,94 @@
+<div class="body-exam row">
+  <!--<div class="question-num col-md-2">-->
+  <!--<ul class="row">-->
+  <!--<li class="col-md-3">-->
+  <!--<a href="#1"><p num-data="1" class="">1</p></a>-->
+  <!--</li>-->
+  <!--<li class="col-md-3">-->
+  <!--<a href="#2"><p num-data="2" class="">2</p></a>-->
+  <!--</li>-->
+  <!--<li class="col-md-3">-->
+  <!--<a href="#3"><p num-data="3" class="">3</p></a>-->
+  <!--</li>-->
+  <!--<li class="col-md-3">-->
+  <!--<a href="#4"><p num-data="4" class="">4</p></a>-->
+  <!--</li>-->
+  <!--</ul>-->
+  <!--<button data-toggle="modal" data-target="#myModal" class="btn submit-exam">Submit</button>-->
+  <!--</div>-->
+  <!--<div class="question-info col-md-12" *ngIf="testList.length == 0">-->
+  <!--<h2>{{mess}}</h2>-->
+  <!--</div>-->
+  <div class="question-info col-md-12">
+    <!--<div class="">-->
+    <!--<div *ngFor="let item of testList; let i = index" id="{{item.id}}" class="quest col-md-12 row">-->
+    <!--<div class="num-flag col-md-2">-->
+    <!--<p>-->
+    <!--<b>Question {{i + 1}}</b>-->
+    <!--<span>Mark: {{item.mark}} / {{item.totalMark}}</span>-->
+    <!--</p>-->
+    <!--</div>-->
+    <!--<div class="text-question col-md-10 card">-->
+    <!--<div class="card-body">-->
+    <!--<p>-->
+    <!--<span>{{item.question}}</span>-->
+    <!--</p>-->
+    <!--<ul *ngIf="item.questType == 'checkbox'" class="list-aw">-->
+    <!--<li *ngFor="let aw of item.listAnswer" [class.inCorrect-aw]="aw.isChecked && !aw.isCorrect" [class.correct-aw]="aw.isCorrect">-->
+    <!--<input type="checkbox" [checked]="aw.isChecked" value="{{aw.anwser}}" name="1"> {{aw.answer}}-->
+    <!--</li>-->
+    <!--</ul>-->
+    <!--<ul *ngIf="item.questType == 'text'" class="list-aw">-->
+    <!--<li *ngFor="let aw of item.listAnswer">-->
+    <!--<input type="{{item.questType}}" [(ngModel)]="aw.anwser" name="{{aw.id}}">-->
+    <!--</li>-->
+    <!--</ul>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
+    <div>
+      <div *ngFor="let item of testList; let i = index" id="{{item.id}}" class="quest col-md-12 row">
+        <div class="num-flag col-md-2">
+          <p>
+            <b>Question {{i + 1}}</b>
+            <span>Mark: {{Math.round(item.mark * 100)/100}} / {{item.totalMark}}</span>
+          </p>
+        </div>
+        <div class="question-box text-question col-md-10 card">
+          <div class="card-body">
+            <p class="">
+              <span class="question" [innerHTML]="item.question"></span>
+            </p>
+            <ul class="list-aw" *ngIf="item.type == 'Multi-choice'">
+              <li *ngFor="let aw of item.listAnswer" [class.inCorrect-aw]="aw.isChecked && !aw.isCorrect" [class.correct-aw]="aw.isCorrect">
+                <input disabled type="checkbox" [checked]="aw.isChecked" value="{{aw.answer}}" name="{{item.id}}">
+                <span [innerHTML]="aw.answer"></span>
+              </li>
+            </ul>
+            <ul class="list-aw" *ngIf="item.type == 'Single-choice'">
+              <li *ngFor="let aw of item.listAnswer" [class.inCorrect-aw]="aw.isChecked && !aw.isCorrect" [class.correct-aw]="aw.isCorrect">
+                <input disabled type="radio" [checked]="aw.isChecked" value="{{aw.answer}}" name="{{item.id}}">
+                <span [innerHTML]="aw.answer"></span>
+              </li>
+            </ul>
+            <ul *ngIf="item.type == 'text'" class="list-aw">
+              <li *ngFor="let aw of item.listAnswer">
+                {{aw.answer}} -
+                <input type="{{item.questType}}" [(ngModel)]="aw.value" name="{{aw.id}}">
+              </li>
+            </ul>
+            <ul *ngIf="item.type == 'select'" class="list-aw">
+              <li *ngFor="let aw of item.listAnswer">
+                {{aw.answer}} -
+                <select [(ngModel)]="aw.value">
+                  <option *ngFor="let choice of item.listChoicing" value="{{choice.value}}">{{choice.value}}</option>
+                </select>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

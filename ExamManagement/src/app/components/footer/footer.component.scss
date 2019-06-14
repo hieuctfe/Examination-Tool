@@ -1,0 +1,25 @@
+@import "../../../assets/css/theme";
+
+.footer-main{
+  background: $main-cl;
+  color: white;
+}
+
+ul{
+  padding-left: 0;
+  a{
+    color: white;
+  }
+}
+
+.mail-link{
+  color: white;
+  text-decoration: underline;
+}
+
+.media-icon{
+  i{
+    font-size: 20px;
+    margin-right: 5px;
+  }
+}

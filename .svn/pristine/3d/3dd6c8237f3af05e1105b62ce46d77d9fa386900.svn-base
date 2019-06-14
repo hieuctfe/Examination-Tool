@@ -1,0 +1,40 @@
+<div class="card-body">
+  <h4 class="text-center">Manage Exam Code</h4>
+  <button class="btn btn-info mb-4" (click)="showModal()">
+    Add New
+  </button>
+  <table [ngClass]="(!examCodes || examCodes.length === 0) ? 'table': 'table  table-hover'">
+    <thead>
+      <tr>
+        <th>Semester</th>
+        <th>Exam Test</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <ng-container *ngFor="let q of examCodes">
+        <tr>
+          <td>{{q.semester}}</td>
+          <td>{{q.code}}</td>
+          <td>{{q.startDate | date: 'dd/MM/yyyy - hh:mm'}}</td>
+          <td>{{q.endDate | date: 'dd/MM/yyyy - hh:mm'}}</td>
+          <td>
+            <button *ngIf="q.outOfDate !== 'out'" class="btn btn-info mr-2" (click)="showModal(q)" tooltip="Edit Exam">
+              <i class="ion ion-md-create"></i>
+            </button>
+            <button *ngIf="q.outOfDate !== 'out'" class="btn btn-danger" (click)="confirm(q)" tooltip="Delete Exam">
+              <i class="ion ion-md-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-container *ngIf="!examCodes|| examCodes.length === 0">
+        <tr>
+          <td colspan="6" class="text-center text-danger">Exam Code is empty</td>
+        </tr>
+      </ng-container>
+    </tbody>
+  </table>
+</div>
