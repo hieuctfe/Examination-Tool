@@ -38,7 +38,7 @@
     "datatables.net-select": "^1.2.7",
     "datatables.net-select-dt": "^1.2.7",
     "docxtemplater": "^3.9.0",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "jszip": "^2.6.1",
     "jszip-utils": "0.0.2",
     "ng-multiselect-dropdown": "^0.2.1",
